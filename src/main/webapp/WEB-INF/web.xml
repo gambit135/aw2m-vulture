@@ -73,13 +73,5 @@
     </servlet-mapping>
     <!-- END Multiple Values Test Servlet -->
     <!-- Wikipedia Test Servlet -->
-    <servlet>
-        <servlet-name>WikipediaTest</servlet-name>
-        <servlet-class>com.example.test.WikipediaRenderPageTest</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>WikipediaTest</servlet-name>
-        <url-pattern>/WikipediaTest</url-pattern>
-    </servlet-mapping>
     <!-- END Wikipedia Test Servlet -->
 </web-app>

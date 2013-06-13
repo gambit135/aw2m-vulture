@@ -2,10 +2,10 @@ package com.example.test;
 
 import java.net.URLEncoder;
 import java.util.LinkedList;
-import retrieval.wikipedia.util.OpenSearchUtil;
-import retrieval.wikipedia.util.QueryUtil;
 import retrieval.wikipedia.infobox.model.GenericInfobox;
 import retrieval.wikipedia.infobox.model.MusicalArtistInfobox;
+import retrieval.wikipedia.util.OpenSearchUtil;
+import retrieval.wikipedia.util.QueryUtil;
 
 /**
  * Class for testing the modularity of the HttpGetConnectionClient and

@@ -1,17 +1,12 @@
 package com.example.test;
 
-import info.bliki.api.Page;
-import info.bliki.api.User;
-import info.bliki.wiki.model.WikiModel;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.omg.CORBA.TCKind;
 
 /**
  * This example demonstrates the use of the {@link ResponseHandler} to simplify

@@ -67,41 +67,52 @@
             <scope>provided</scope>
         </dependency>
         <!-- bliki -->
+        
+        <!--
         <dependency>
             <groupId>info.bliki.wiki</groupId>
             <artifactId>bliki-core</artifactId>
             <version>3.0.18</version>
         </dependency>
-        <!-- HermiT-->
+        -->
+        <!-- HermiT -->
+        <!--
         <dependency>
             <groupId>org.semanticweb</groupId>
             <artifactId>HermiT</artifactId>
             <version>1.3.5</version>
             <type>jar</type>
         </dependency>
+        -->
         <!-- Align API-->
+        <!--
         <dependency>
             <groupId>org.semanticweb</groupId>
             <artifactId>align</artifactId>
             <version>4.3</version>
             <type>jar</type>
         </dependency> 
+        -->
         <!-- OWL API-->
+        <!--
         <dependency>
             <groupId>org.semanticweb</groupId>
             <artifactId>owlapi</artifactId>
             <version>3.2.4</version>
             <type>jar</type>
         </dependency>
-        <!-- procAlign API -->
-        
-        <!-- ontosim -->         
+        -->
+        <!-- procAlign API -->        
+        <!-- ontosim -->      
+        <!--   
         <dependency>
             <groupId>org.semanticweb</groupId>
             <artifactId>ontosim</artifactId>
             <version>2.2</version>
         </dependency>
+        -->
         <!-- JSON -->
+        <!--
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
@@ -109,12 +120,15 @@
             <scope>compile</scope>
             <classifier>jdk15</classifier>
         </dependency>
+        -->
         <!-- MySQL-->
+        <!--
         <dependency>
             <groupId>org.semanticweb</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.5</version>
         </dependency>
+        -->
         <!-- Apache HttpComponents -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -176,6 +190,7 @@
         </plugins>
     </build>
     <repositories>     
+        <!--
         <repository>
             <id>info-bliki-repository</id>
             <url>http://gwtwiki.googlecode.com/svn/maven-repository/</url>
@@ -183,10 +198,21 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        -->
+        <!-- <url>http://ontocat.sourceforge.net/maven/repo/</url> -->
+        <!--
         <repository>
             <id>org-semanticweb-repository</id>
-            <!-- <url>http://ontocat.sourceforge.net/maven/repo/</url> -->
             <url>http://dl.dropbox.com/u/20278793/mvn-repository/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        -->
+        <!-- AW2M Dropbox repo -->
+        <repository>
+            <id>org-aw2m-repository</id>
+            <url>http://dl.dropbox.com/u/20278793/aw2m-mvn-repository/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
