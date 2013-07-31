@@ -148,6 +148,12 @@
             <version>3.1.1.RELEASE</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -200,7 +206,7 @@
         </repository>
         -->
         <!-- <url>http://ontocat.sourceforge.net/maven/repo/</url> -->
-        <!--
+        
         <repository>
             <id>org-semanticweb-repository</id>
             <url>http://dl.dropbox.com/u/20278793/mvn-repository/</url>
@@ -208,7 +214,7 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-        -->
+        
         <!-- AW2M Dropbox repo -->
         <repository>
             <id>org-aw2m-repository</id>

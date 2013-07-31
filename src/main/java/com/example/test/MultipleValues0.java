@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author Alejandro Téllez G. <java.util.fck@hotmail.com>
  */
-public class MultipleValues2 extends HttpServlet {
+public class MultipleValues0 extends HttpServlet {
 
     /**
      * Processes requests for both HTTP
@@ -63,7 +63,6 @@ public class MultipleValues2 extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
@@ -73,9 +72,27 @@ public class MultipleValues2 extends HttpServlet {
         out.println("</HEAD>");
         out.println("<BODY>");
 
-        //Call the java class that will execute a HTTP request via POST method.
-        out.println(MainSendPostRequest.getBodyfromPostResponseToRequest());
+        out.println("<BR>");
+        out.println("<BR>Select your favorite music:");
+        out.println("<BR><FORM METHOD=POST>");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteMusic VALUE=Rock>Rock");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteMusic VALUE=Jazz>Jazz");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteMusic VALUE=Classical>Classical");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteMusic VALUE=Country>Country");
+        out.println("<BR><INPUT TYPE=SUBMIT VALUE=Submit>");
 
+        out.println("<BR>Select your favorite Food:");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteFood VALUE=Eggs>Eggs");
+        out.println("<BR><INPUT TYPE=CHECKBOX "
+                + "NAME=favoriteFood VALUE=Ham>Ham");
+
+
+        out.println("</FORM>");
         out.println("</BODY>");
         out.println("</HTML>");
         //processRequest(request, response);
@@ -94,33 +111,33 @@ public class MultipleValues2 extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
-        /*
-         PrintWriter out = response.getWriter();
-         response.setContentType("text/html");
 
-         //Session management
-         HttpSession session = request.getSession();
-         HashSet<String> musicalLikes = new HashSet<String>();
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html");
 
-         //Get list of names
-         List<String> names = Collections.list(
-         (Enumeration<String>) request.getParameterNames());
+        //Session management
+        HttpSession session = request.getSession();
+        HashSet<String> musicalLikes = new HashSet<String>();
 
-         out.println("<ul>");
-         //For each name on the list
-         for (String name : names) {
-         out.println("<li> Values for name: " + name + "</li>");
-         //Get list of values for each name
-         String[] values = request.getParameterValues(name);
-         out.println("Values' size: " + values.length);
-         out.println("<ul>");
-         for (String value : values) {
-         out.println("<li>Value: " + value + " </li>");
-         }
-         out.println("</ul>");
-         }
-         out.println("</ul>");
-         */
+        //Get list of names
+        List<String> names = Collections.list(
+                (Enumeration<String>) request.getParameterNames());
+
+        out.println("<ul>");
+        //For each name on the list
+        for (String name : names) {
+            out.println("<li> Values for name: " + name + "</li>");
+            //Get list of values for each name
+            String[] values = request.getParameterValues(name);
+            out.println("Values' size: " + values.length);
+            out.println("<ul>");
+            for (String value : values) {
+                out.println("<li>Value: " + value + " </li>");
+            }
+            out.println("</ul>");
+        }
+        out.println("</ul>");
+
         /*
          * String[] values = request.getParameterValues("favoriteMusic"); if
          * (values != null) { int length = values.length; out.println("You have

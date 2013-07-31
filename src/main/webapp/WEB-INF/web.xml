@@ -64,6 +64,14 @@
     <!--END Alignment Test Servlet-->
     <!-- Multiple Values Test Servlet -->
     <servlet>
+        <servlet-name>MultipleValues0</servlet-name>
+        <servlet-class>com.example.test.MultipleValues0</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MultipleValues0</servlet-name>
+        <url-pattern>/MultipleValues0</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>MultipleValues</servlet-name>
         <servlet-class>com.example.test.MultipleValues</servlet-class>
     </servlet>
