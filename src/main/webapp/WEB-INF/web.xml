@@ -71,6 +71,14 @@
         <servlet-name>MultipleValues</servlet-name>
         <url-pattern>/MultipleValues</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>MultipleValues2</servlet-name>
+        <servlet-class>com.example.test.MultipleValues2</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MultipleValues2</servlet-name>
+        <url-pattern>/MultipleValues2</url-pattern>
+    </servlet-mapping>
     <!-- END Multiple Values Test Servlet -->
     <!-- Wikipedia Test Servlet -->
     <!-- END Wikipedia Test Servlet -->
