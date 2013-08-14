@@ -25,6 +25,10 @@
         <servlet-name>PrintMusicalInfoboxes</servlet-name>
         <servlet-class>com.example.test.PrintMusicalInfoboxes</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeserializeEndpoint</servlet-name>
+        <servlet-class>aw2m.remote.endpoint.DeserializeEndpoint</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>/musicalArtist/*</url-pattern>
@@ -48,6 +52,10 @@
     <servlet-mapping>
         <servlet-name>PrintMusicalInfoboxes</servlet-name>
         <url-pattern>/PrintMusicalInfoboxes</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeserializeEndpoint</servlet-name>
+        <url-pattern>/DeserializeEndpoint</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

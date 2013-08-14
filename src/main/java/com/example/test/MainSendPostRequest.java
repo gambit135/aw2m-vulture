@@ -2,7 +2,6 @@ package com.example.test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
@@ -61,7 +60,6 @@ public class MainSendPostRequest {
             method.releaseConnection();
         }
         catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -100,7 +98,6 @@ public class MainSendPostRequest {
             method.releaseConnection();
         }
         catch (IOException e) {
-            e.printStackTrace();
         }
         return st;
     }
