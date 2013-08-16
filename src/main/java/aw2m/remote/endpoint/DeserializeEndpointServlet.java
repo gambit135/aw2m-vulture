@@ -6,10 +6,15 @@ package aw2m.remote.endpoint;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -61,7 +66,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //processRequest(request, response);
-      
+
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
@@ -92,8 +97,10 @@ public class DeserializeEndpointServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
-        
+
+        //Do something with the received parameters.
+
+
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
@@ -104,13 +111,37 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
+
+            out.println("<ul>");
+
+            //Session management
+            HttpSession session = request.getSession();
+            HashSet<String> musicalLikes = new HashSet<String>();
+
+            //Get list of names
+            List<String> names = Collections.list(
+                    (Enumeration<String>) request.getParameterNames());
+            
+            //For each name on the list
+            for (String name : names) {
+                out.println("<li> Values for name: " + name + "</li>");
+                //Get list of values for each name
+                String[] values = request.getParameterValues(name);
+                out.println("Values' size: " + values.length);
+                out.println("<ul>");
+                for (String value : values) {
+                    out.println("<li>Value: " + value + " </li>");
+                }
+                out.println("</ul>");
+            }
+            //End of HTML
+            out.println("</ul>");
             out.println("</body>");
             out.println("</html>");
         }
         finally {
             out.close();
         }
-        //Do something with the received parameters.
     }
 
     /**
