@@ -27,7 +27,7 @@
     </servlet>
     <servlet>
         <servlet-name>DeserializeEndpoint</servlet-name>
-        <servlet-class>aw2m.remote.endpoint.DeserializeEndpoint</servlet-class>
+        <servlet-class>aw2m.remote.endpoint.DeserializeEndpointServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Alejandro Téllez G. <java.util.fck@hotmail.com>
  */
-public class DeserializeEndpoint extends HttpServlet {
+public class DeserializeEndpointServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP
@@ -35,14 +35,14 @@ public class DeserializeEndpoint extends HttpServlet {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet DeserializeEndpoint</title>");            
+            out.println("<title>Servlet DeserializeEndpoint Mark II</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet DeserializeEndpoint at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeserializeEndpoint Mark II at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-        finally {            
+        finally {
             out.close();
         }
     }
@@ -75,7 +75,8 @@ public class DeserializeEndpoint extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
+        //Do something with the received parameters.
     }
 
     /**
