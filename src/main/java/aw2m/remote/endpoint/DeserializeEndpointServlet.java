@@ -60,7 +60,24 @@ public class DeserializeEndpointServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
+      
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>GET METHOD @ Servlet DeserializeEndpoint Mark II</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>This is the GET METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+        finally {
+            out.close();
+        }
     }
 
     /**
@@ -76,6 +93,23 @@ public class DeserializeEndpointServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //processRequest(request, response);
+        
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>POST METHOD @ Servlet DeserializeEndpoint Mark II</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+        finally {
+            out.close();
+        }
         //Do something with the received parameters.
     }
 
