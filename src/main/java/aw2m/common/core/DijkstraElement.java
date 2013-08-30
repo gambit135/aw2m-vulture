@@ -1,6 +1,7 @@
 package aw2m.common.core;
 
 import aw2m.common.core.GridCell;
+import aw2m.common.core.GridCell;
 
 /**
  *

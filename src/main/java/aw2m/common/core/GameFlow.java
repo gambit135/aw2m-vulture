@@ -27,8 +27,9 @@ public class GameFlow {
         System.out.println("Gameflow starated");
 
         //First, an instance of GameInstance must be created
+        //Specify which map to play
         System.out.println("Creating GameInstance");
-        mainGameInstance = new GameInstance();
+        mainGameInstance = new GameInstance(MapCatalog.SPANN_ISLAND);
         //Players are initialized
         //A map must be loaded unto that mainGameInstance
         System.out.println("Loading map");
@@ -162,17 +163,27 @@ public class GameFlow {
         //Testing booleans to String
         boolean bulean = false;
         System.out.println("Boolean value to String: " + bulean);
-        
-        
+
+
         //First, deconstruct and reconstruct the game, calling the app on the cloud
 
+        
+        //DEBUG
+        /* Comment the next line to switch between 
+         * not predefined and predefined modes of the map
+         * To test two different types of reconstruction on the server side.
+         */
+        //mainGameInstance.mapChosen = MapCatalog.UNDEFINED;
+        
+        
+        //LAST CHANGE!:
         //Create a new object for executing the HTTP POST request
         MakePostRequest request = new MakePostRequest(mainGameInstance);
         String result = request.executePostRequest();
         System.out.println("THIS SHOULD PRINT THE RESPONSE BODY");
         System.out.println(result);
-        
-        
+
+
         //END OF TESTS
 
         //Then, design the API for the UI

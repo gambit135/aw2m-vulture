@@ -78,7 +78,7 @@ public class GameInstance {
 
     /**
      * Creates a new GameInstance object, receiving player and map info as
-     * parameters. This metho is used when reconstructing a deserialized game.
+     * parameters. This method is used when reconstructing a deserialized game.
      *
      * @param players
      * @param map

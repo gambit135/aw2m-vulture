@@ -140,6 +140,10 @@ public class Deserialize {
      * @param players The array of players to be updated by reference.
      */
     public void deserializeProperties(String raw, GridCell[][] map, Player[] players) {
+        //Reset property info from players
+        for (Player p : players) {
+            p.properties = new LinkedList<GridCell>();
+        }
         //First, use ; separator: separates each player-properties part.
         StringTokenizer st1 = new StringTokenizer(raw, ";");
         while (st1.hasMoreTokens()) {
@@ -175,10 +179,14 @@ public class Deserialize {
                                         break;
                                     case 2: //Capt points
                                         if (map[x][y].isProperty) {
+                                            //Assign property instance info to GridCell
                                             map[x][y].propertyInstance =
                                                     new PropertyInstance(
                                                     players[Byte.parseByte(playerID)],
                                                     Byte.parseByte(st4.nextToken()));
+                                            //Then, assign this property to its corresponding player
+                                            //Accounting each property to its player
+                                            players[Byte.parseByte(playerID)].properties.add(map[x][y]);
                                             System.out.println("The reconstructed property is type "
                                                     + map[x][y].property.propertyType
                                                     + " with "
@@ -275,6 +283,8 @@ public class Deserialize {
                 c++;
             }
         }
+        //DEBUG
+        //Prints each unit for each player
         for (Player p : players) {
             System.out.println("Units for Player " + p.id);
             for (Unit u : p.units) {
