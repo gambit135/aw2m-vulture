@@ -3,6 +3,7 @@ package aw2m.remote.endpoint;
 import aw2m.common.core.GameInstance;
 import aw2m.common.core.Player;
 import aw2m.common.serialize.Deserialize;
+import aw2m.remote.creator.maploader.MapLoader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -75,10 +76,12 @@ public class GameRebuilder {
         Deserialize d = new Deserialize();
         //First deserialize Players
         rebuiltGame.players = d.deserializePlayers(request.getParameter("players"));
+        
 
         //Deserialize map and terrain
         if (isPredefined) {
             //Is Predefined - Load map from catalog
+            MapLoader.loadMapFromCatalog(rebuiltGame, mapChosen);
         }
         else {
             //Deserialize terrain from parameter

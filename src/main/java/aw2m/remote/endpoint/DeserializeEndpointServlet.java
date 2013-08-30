@@ -186,6 +186,9 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
         }
+        catch(Exception e){
+            out.println("<h1>ERROR!!");
+        }
         finally {
             out.close();
         }
