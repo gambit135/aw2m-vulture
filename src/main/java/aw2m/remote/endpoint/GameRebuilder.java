@@ -60,7 +60,7 @@ public class GameRebuilder {
         //   return value of d.deserializePlayers(String)
         //
         //3. Deserialize terrain
-        //  if(isNOTpredeployed, i.e. the terrain is on a String)
+        //  if(isNOTpredeployed, i.e. the terrain is on the terrain parameter)
         //      Create a GridCell[][] and assign it to the return
         //      value of d.deserializeTerrain(String)
         //

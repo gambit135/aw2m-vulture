@@ -4,6 +4,7 @@
  */
 package aw2m.remote.endpoint;
 
+import aw2m.common.stats.Statistic;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -52,7 +53,6 @@ public class DeserializeEndpointServlet extends HttpServlet {
         }
     }
 
-  
     /**
      * Handles the HTTP
      * <code>GET</code> method.
@@ -102,10 +102,10 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
 
         response.setContentType("text/html;charset=UTF-8");
-        
+
         //The updated serialized data must be printed
         PrintWriter out = response.getWriter();
-        
+
         Date today = new Date();
         try {
             /* TODO output your page here. You may use following sample code. */
@@ -115,7 +115,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
-            out.println("<h2>Server time: "+ today +"</h2>");
+            out.println("<h2>Server time: " + today + "</h2>");
 
             out.println("<ul>");
 
@@ -150,6 +150,8 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 session = request.getSession(create = true);
             }
 
+            //Variable of storing total size of String overhead, on bytes
+            int overhead = 0;
             //Get list of names
             List<String> names = Collections.list(
                     (Enumeration<String>) request.getParameterNames());
@@ -162,12 +164,19 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 out.println("Values' size: " + values.length);
                 out.println("<ul>");
                 for (String value : values) {
-                    out.println("<li>Value: " + value + " </li>");
+                    out.println("<li>Value: " + value);
+                    int oh = Statistic.calculateByteSizeOfStringOverhead(value);
+                    out.println("String size overhead (bytes): " + oh);
+                    out.println("</li>");
+                    overhead += oh;
                 }
                 out.println("</ul>");
             }
             //End of HTML
             out.println("</ul>");
+
+            out.println("<br>");
+            out.println("<h3>Total String overhead (bytes): " + overhead + "</h3>");
             out.println("</body>");
             out.println("</html>");
         }
