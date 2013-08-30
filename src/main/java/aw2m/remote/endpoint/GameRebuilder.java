@@ -22,32 +22,32 @@ public class GameRebuilder {
      */
     HttpServletRequest request;
     GameInstance rebuiltGame;
+    byte mapChosen;
+    boolean isPredefined;
 
     public GameRebuilder(HttpServletRequest request) {
         this.request = request;
     }
 
     public void getParametersFromRequest() {
-        byte mapChosen = 0;
-        boolean isPredefined ;
-
+        mapChosen = 0;
         //First, check if is predefined
 
         //Get list of names
         List<String> names = Collections.list(
                 (Enumeration<String>) request.getParameterNames());
-        
+
         //Search for isPredefined value
-        for(String s : names){
-            if(s.equals("isPredefined")){
-                if(request.getParameterValues(s)[0].equals("true")){
+        for (String s : names) {
+            if (s.equals("isPredefined")) {
+                if (request.getParameterValues(s)[0].equals("true")) {
                     isPredefined = true;
                 }
-                else{
-                    isPredefined  = false;
+                else {
+                    isPredefined = false;
                 }
             }
-            if (s.equals("mapChosen")){
+            if (s.equals("mapChosen")) {
                 mapChosen = Byte.parseByte(request.getParameterValues(s)[0]);
             }
         }
@@ -69,16 +69,19 @@ public class GameRebuilder {
         //      Only the terrain part should be taken into account
         //      The 
 
+        //Create a new, empty GameInstace object
+        rebuiltGame = new GameInstance();
+
         Deserialize d = new Deserialize();
         //First deserialize Players
-        Player[] players = d.deserializePlayers(request.getParameter("players"));
-
+        rebuiltGame.players = d.deserializePlayers(request.getParameter("players"));
 
         //Deserialize map and terrain
-        if (request.getParameter("isPredefined").equals("true")) {
+        if (isPredefined) {
             //Is Predefined - Load map from catalog
         }
         else {
+            //Deserialize terrain from parameter
         }
     }
 

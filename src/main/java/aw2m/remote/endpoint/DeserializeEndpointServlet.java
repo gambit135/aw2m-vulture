@@ -115,7 +115,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
-            out.println("<h2>+"+ today +"</h2>");
+            out.println("<h2>Server time: "+ today +"</h2>");
 
             out.println("<ul>");
 
@@ -156,7 +156,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
             //For each name on the list
             for (String name : names) {
-                out.println("<li> Values for name: " + name + "</li>");
+                out.println("<li> Values for name: <b>" + name + "<b></li>");
                 //Get list of values for each name
                 String[] values = request.getParameterValues(name);
                 out.println("Values' size: " + values.length);

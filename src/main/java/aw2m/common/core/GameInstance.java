@@ -32,11 +32,20 @@ public class GameInstance {
     public GridCell[][] map;
 
     /**
-     * GameInstance constructor should initialize players. Default constructor
-     * sets Spann Island as map and initializes two players.
+     * Default constructor. May be used during remote game reconstruction
      */
     public GameInstance() {
+    }
+
+    /**
+     * GameInstance constructor takes as parameter a predefined map to load and
+     * initializes players. Another constructor for not predefined maps should
+     * be created.
+     */
+    public GameInstance(byte mapChosen) {
         //Setting number of players on the map
+        this.mapChosen = mapChosen;
+        System.out.println("Initial value of 'mapChosen: " + mapChosen);
         this.numberOfPlayers = MapCatalog.getNoOfPlayers(mapChosen);
         //Initializing players
         System.out.println("Default Constructor");
