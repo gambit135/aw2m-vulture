@@ -169,8 +169,8 @@ public class DeserializeEndpointServlet extends HttpServlet {
                     out.println("<li>Value: " + value);
                     int oh = Statistic.calculateByteSizeOfStringOverhead(value);
                     int size = Statistic.calculateByteSizeofString(value);
-                    out.println("String size (bytes): " + value);
-                    out.println("String size overhead (bytes): " + oh);
+                    out.println("<br>String size (bytes): " + value);
+                    out.println("<br>String size overhead (bytes): " + oh);
                     out.println("</li>");
                     overhead += oh;
                     totalSize += size;
