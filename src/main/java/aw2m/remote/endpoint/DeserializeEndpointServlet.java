@@ -150,7 +150,9 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 session = request.getSession(create = true);
             }
 
-            //Variable of storing total size of String overhead, on bytes
+            //Total size of String, in bytes
+            int totalSize = 0;
+            //Total overhead of String size, in bytes
             int overhead = 0;
             //Get list of names
             List<String> names = Collections.list(
@@ -166,9 +168,12 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 for (String value : values) {
                     out.println("<li>Value: " + value);
                     int oh = Statistic.calculateByteSizeOfStringOverhead(value);
+                    int size = Statistic.calculateByteSizeofString(value);
+                    out.println("String size (bytes): " + value);
                     out.println("String size overhead (bytes): " + oh);
                     out.println("</li>");
                     overhead += oh;
+                    totalSize += size;
                 }
                 out.println("</ul>");
             }
@@ -176,6 +181,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</ul>");
 
             out.println("<br>");
+            out.println("<h3>Total String size (bytes): " + totalSize + "</h3>");
             out.println("<h3>Total String overhead (bytes): " + overhead + "</h3>");
             out.println("</body>");
             out.println("</html>");
