@@ -7,8 +7,8 @@ package aw2m.remote.endpoint;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -52,7 +52,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+  
     /**
      * Handles the HTTP
      * <code>GET</code> method.
@@ -102,26 +102,58 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
 
         response.setContentType("text/html;charset=UTF-8");
+        
+        //The updated serialized data must be printed
         PrintWriter out = response.getWriter();
+        
+        Date today = new Date();
         try {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>POST METHOD @ Servlet DeserializeEndpoint Mark II</title>");
+            out.println("<title>POST METHOD @ Servlet DeserializeEndpoint Mark II  </title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
+            out.println("<h2>+"+ today +"</h2>");
 
             out.println("<ul>");
 
             //Session management
-            HttpSession session = request.getSession();
-            HashSet<String> musicalLikes = new HashSet<String>();
+
+            //Validate if there exists already a session on the server
+
+            //I STILL DON'T KNOW WHY THIS MIGHT BE USEFUL
+            /*Session might be useful for storing TERRAIN data: as the map.
+             * But this will only be benefical when using 
+             * not predeployed -custom- maps.             
+             */
+
+
+            /*It might also help to deal with IA, 
+             * assuming the AI can have continuity*/
+
+            /*But it must be noted that NOT always TWO consecutive turns 
+             * are played by the AI on the cloud.*/
+
+            /*If continuity is to be considered: 
+             * the variables and aspects that may ensure it must be passed as
+             * parameters, via the serialization process 
+             * and unto the HTTP REQUEST*/
+
+            boolean create;
+            HttpSession session = request.getSession(create = false);
+
+            //There was no session created before
+            //use session.isNew()
+            if (session == null) {
+                session = request.getSession(create = true);
+            }
 
             //Get list of names
             List<String> names = Collections.list(
                     (Enumeration<String>) request.getParameterNames());
-            
+
             //For each name on the list
             for (String name : names) {
                 out.println("<li> Values for name: " + name + "</li>");

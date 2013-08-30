@@ -2,6 +2,7 @@ package aw2m.common.serialize;
 
 import aw2m.common.core.GameInstance;
 import aw2m.remote.creator.maploader.MapCatalog;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -84,8 +85,18 @@ public class MakePostRequest {
                     + HttpStatus.getStatusText(statusCode));
 
             responseBody = method.getResponseBodyAsString();
+
+            byte[] res = method.getResponseBody();
+            //Write output to a HTML file
+            FileOutputStream fos = new FileOutputStream("EndpointResponse.html");
+            fos.write(res);
+            fos.close();
         }
         catch (IOException ioe) {
+        }
+        finally {
+            //release connection
+            method.releaseConnection();            
         }
         return responseBody;
     }
