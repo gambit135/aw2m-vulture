@@ -8,7 +8,7 @@ package aw2m.common.stats;
 public class Statistic {
 
     public static int calculateByteSizeOfStringOverhead(String eval) {
-        return (int) (((eval.length() * 2) + 45) / 8);
+        return (int) (8 * (((eval.length() * 2) + 45) / 8));
     }
 
     public static int calculateByteSizeofString(String eval) {
