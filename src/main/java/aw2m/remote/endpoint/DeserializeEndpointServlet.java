@@ -156,7 +156,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
             //For each name on the list
             for (String name : names) {
-                out.println("<li> Values for name: <b>" + name + "<b></li>");
+                out.println("<li> Values for name: <b>" + name + "</b></li>");
                 //Get list of values for each name
                 String[] values = request.getParameterValues(name);
                 out.println("Values' size: " + values.length);
