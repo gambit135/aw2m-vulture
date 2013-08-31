@@ -146,9 +146,9 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
             //There was no session created before
             //use session.isNew()
-            if (session == null) {
-                session = request.getSession(create = true);
-            }
+            //if (session == null) {
+            //    session = request.getSession(create = true);
+            //}
 
             //Total size of String, in bytes
             int totalSize = 0;
