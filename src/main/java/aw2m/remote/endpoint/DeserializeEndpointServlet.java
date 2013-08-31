@@ -115,7 +115,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
-            out.println("<h2>Server time: " + today + "</h2>");
+            out.println("<h2>Server time & date: " + today + "</h2>");
 
             out.println("<ul>");
 
