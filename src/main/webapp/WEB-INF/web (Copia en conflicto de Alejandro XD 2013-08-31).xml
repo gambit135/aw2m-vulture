@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>Spring-Hibernate-Template</display-name>
+    <!-- Spring Servlet - PEOPLE page -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>HolaMundoServlet</servlet-name>
+        <servlet-class>com.example.test.HolaMundoServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HolaMundoServletMarkII</servlet-name>
+        <servlet-class>com.example.test.HolaMundoServletMarkII</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PrintMusicalInfoboxes</servlet-name>
+        <servlet-class>com.example.test.PrintMusicalInfoboxes</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/musicalArtist/*</url-pattern>
+        <!-- <url-pattern>/people/*</url-pattern> -->
+    </servlet-mapping>
+    <!-- END Spring Servlet - PEOPLE page -->
+    <!--
+    <servlet-mapping>
+        <servlet-name>ReasonerTestServlet</servlet-name>
+        <url-pattern>/ReasonerTestServlet</url-pattern>
+    </servlet-mapping>
+    -->
+    <servlet-mapping>
+        <servlet-name>HolaMundoServlet</servlet-name>
+        <url-pattern>/HolaMundoServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HolaMundoServletMarkII</servlet-name>
+        <url-pattern>/HolaMundoServletMarkII</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PrintMusicalInfoboxes</servlet-name>
+        <url-pattern>/PrintMusicalInfoboxes</url-pattern>
+    </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    <!--Alignment Test Servlet-->
+    <servlet>
+        <servlet-name>AlignmentTestServlet</servlet-name>
+        <servlet-class>alignmenttest.AlignmentTestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AlignmentTestServlet</servlet-name>
+        <url-pattern>/AlignmentTestServlet</url-pattern>
+    </servlet-mapping>
+    <!--END Alignment Test Servlet-->
+    <!-- Multiple Values Test Servlet -->
+    <servlet>
+        <servlet-name>MultipleValues</servlet-name>
+        <servlet-class>com.example.test.MultipleValues</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MultipleValues</servlet-name>
+        <url-pattern>/MultipleValues</url-pattern>
+    </servlet-mapping>
+    <!-- END Multiple Values Test Servlet -->
+    <!-- Wikipedia Test Servlet -->
+    <!-- END Wikipedia Test Servlet -->
+</web-app>

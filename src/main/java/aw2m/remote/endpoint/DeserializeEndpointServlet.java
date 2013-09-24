@@ -7,6 +7,7 @@ package aw2m.remote.endpoint;
 import aw2m.common.stats.Statistic;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -98,15 +99,21 @@ public class DeserializeEndpointServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        //Register time before doing stuff
+        Date beforeProcessing = new Date();
+        Calendar calendarBefore = Calendar.getInstance();
         //Do something with the received parameters.
-
+        
+        
 
         response.setContentType("text/html;charset=UTF-8");
 
         //The updated serialized data must be printed
         PrintWriter out = response.getWriter();
 
-        Date today = new Date();
+        
+        Date afterProcessing = new Date();
+        Calendar calendarAfter = Calendar.getInstance();
         try {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
@@ -115,7 +122,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
-            out.println("<h2>Server time & date: " + today + "</h2>");
+            out.println("<h2>Server time & date: " + afterProcessing + "</h2>");
 
             out.println("<ul>");
 
@@ -177,7 +184,6 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 }
                 out.println("</ul>");
             }
-            //End of HTML
             out.println("</ul>");
 
             out.println("<br>");
@@ -185,6 +191,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("<h3>Total String overhead (bytes): " + overhead + "</h3>");
             out.println("</body>");
             out.println("</html>");
+            //End of HTML
         }
         catch(Exception e){
             out.println("<h1>ERROR!! <br>");
