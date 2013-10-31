@@ -25,9 +25,11 @@ public class GameRebuilder {
     GameInstance rebuiltGame;
     byte mapChosen;
     boolean isPredefined;
+    String output;
 
     public GameRebuilder(HttpServletRequest request) {
         this.request = request;
+        this.output = "";
     }
 
     public void getParametersFromRequest() {
@@ -86,6 +88,12 @@ public class GameRebuilder {
         else {
             //Deserialize terrain from parameter
         }
+        //Deserialize Properties
+        d.deserializeProperties(request.getParameter("properties"), rebuiltGame.map, rebuiltGame.players);
+        
+        //Deserialize units
+        d.deserializeUnits(request.getParameter("units"), rebuiltGame.map, rebuiltGame.players);
+        
     }
 
     /**

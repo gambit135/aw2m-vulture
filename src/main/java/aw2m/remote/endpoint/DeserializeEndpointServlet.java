@@ -4,6 +4,9 @@
  */
 package aw2m.remote.endpoint;
 
+import aw2m.common.ai.Search;
+import aw2m.common.ai.eval.BranchEvalFunctions;
+import aw2m.common.ai.model.Branch;
 import aw2m.common.stats.Statistic;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -102,16 +105,35 @@ public class DeserializeEndpointServlet extends HttpServlet {
         //Register time before doing stuff
         Date beforeProcessing = new Date();
         //Do something with the received parameters.
-        
-        
+
+        //Rebuild the game
+        GameRebuilder rebuilder = new GameRebuilder(request);
+        rebuilder.getParametersFromRequest();
+
+        //Start AI
+
+        Search search = new Search(rebuilder.rebuiltGame.map);
+        Branch branch = search.createBranchFromOptimalNodes(rebuilder.rebuiltGame.players[1].units);
+        if (branch != null) {
+            branch.evalValue = BranchEvalFunctions.evalBranch(branch);
+            System.out.println("Total branch eval value: " + branch.evalValue);
+            System.out.println("\n Total branches on Branch list: " + search.branches.size());
+            System.out.println("\nOptimal branch:" + search.findOptimalBranchFromBranches(search.branches).toString());
+        }
+        else {
+            System.out.println("\nTotal branches on Branch list: " + search.branches.size());
+            System.out.println("No optimal branch was generated");
+        }
+
+        Date afterProcessing = new Date();
+
 
         response.setContentType("text/html;charset=UTF-8");
 
         //The updated serialized data must be printed
         PrintWriter out = response.getWriter();
 
-        
-        Date afterProcessing = new Date();
+
         try {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
@@ -192,7 +214,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</html>");
             //End of HTML
         }
-        catch(Exception e){
+        catch (Exception e) {
             out.println("<h1>ERROR!! <br>");
             e.printStackTrace(out);
             out.println("<br>");
