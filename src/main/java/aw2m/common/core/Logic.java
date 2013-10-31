@@ -28,8 +28,6 @@ public class Logic {
     private static Set<GridCell> crossArea;
     private static GridCell[][] map;
     //private static Unit attacker;
-    private static int attack1;
-    private static int attackP1;
     private static byte defenseStars1;
     private static int defense2;
     private static int defenseP2;
@@ -155,7 +153,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x][location.y - 1].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x][location.y - 1].unit.player.team != Logic.unit1.player.team) {
@@ -195,7 +193,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x - 1][location.y].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x - 1][location.y].unit.player.team != Logic.unit1.player.team) {
@@ -236,7 +234,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x][location.y + 1].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x][location.y + 1].unit.player.team != Logic.unit1.player.team) {
@@ -280,7 +278,7 @@ public class Logic {
                     //Add nothing, as source GridCell can't be a destiny
                     return;
                 }
-                //If there is a enemy or friend unit on the destination
+                //If there is an enemy or friend unit on the destination
                 if (Logic.map[location.x + 1][location.y].unit != null) {
                     //If the unit is not an ally one
                     if (Logic.map[location.x + 1][location.y].unit.player.team != Logic.unit1.player.team) {
@@ -339,19 +337,94 @@ public class Logic {
     }
 
     /**
-     *
+     * Returns the killzone of an Indirect-attack unit, calculated by
+     * calculating a difference between two sets, as defined by the getCrossArea
+     * method. The sizes of each cross are the maximum and minimum range of the
+     * indirect unit, respectively.
      *
      * @param centerLocation
-     * @param map            - Blablabla
-     * @param u              - The Unit that blablabla
-     * @return
+     * @param map            - The map
+     * @param u              - The indirect unit of whom the killzone wants to
+     *                       be known.
+     * @return A Set containing all the GridCells within the killzone.
      */
-    public static Set<GridCell> getIndirectDeathZOne(GridCell centerLocation, GridCell[][] map, Unit u) {
-        byte maxSize = Unit.getMaxIndirectRange(unit1);
-        byte minSize = Unit.getMinIndirectRange(unit1);
-        Set<GridCell> difference = new HashSet<GridCell>(Logic.getCrossArea(centerLocation, maxSize, map));
+    public static LinkedHashSet<GridCell> getIndirectDeathZOne(GridCell centerLocation, GridCell[][] map, Unit u) {
+        byte maxSize = Unit.getMaxIndirectRange(u);
+        byte minSize = Unit.getMinIndirectRange(u);
+        LinkedHashSet<GridCell> difference = new LinkedHashSet<GridCell>(Logic.getCrossArea(centerLocation, maxSize, map));
         difference.removeAll(Logic.getCrossArea(centerLocation, minSize, map));
         return difference;
+    }
+
+    /**
+     * This method returns a Set of GridCell objects, representing the kill zone
+     * of a direct-attack unit. The method iterates through the movement radius
+     * collection of DijkstraElement objects, and adds the VNN neighbors of all
+     * empty GridCells.
+     *
+     * @param map
+     * @param u
+     * @return
+     */
+    public static LinkedHashSet<GridCell> getDirectDeathZone(GridCell[][] map, Unit u) {
+        //This method returns a list of DijkstraElements
+        //A DijkstraElement is necessary for the A* algorithm
+        //It wraps a GridCell object inside another object containing a weight value relative to the A* algorithm
+        //The thing to do next is iterate through the list of DijkstraElements as we add that GridCell to the deathzone set
+        //As well as adding the VNN on each gridCell that has not an allied unit occupying it.
+
+        LinkedList<DijkstraElement> list = Logic.calculateMovementRadiusUsingAStar(u, map);
+
+        //Set containing the killing zone GridCells
+        LinkedHashSet<GridCell> killZone = new LinkedHashSet<GridCell>();
+
+        //Iterating through the DijkstraElements
+        for (DijkstraElement d : list) {
+            //Add VNN of any gridCell on which the unit can move
+            //A unit can only move for attack unto empty gridCells
+            if (d.gridCell.unit == null) {
+                killZone.addAll(Logic.getVNN(d.gridCell, map));
+            }
+        }
+        return killZone;
+    }
+
+    public static LinkedHashSet<GridCell> getDeathZone(GridCell[][] map, Unit u) {
+        if (u.isDirect(u.unitType)) {
+            return Logic.getDirectDeathZone(map, u);
+        }
+        else {
+            return Logic.getIndirectDeathZOne(u.location, map, u);
+        }
+    }
+
+    /**
+     * Returns a Set containing the GridCell objects located up, down, left and
+     * right of the center location sent as parameter
+     *
+     * @param location
+     * @param map
+     * @return
+     */
+    public static Set<GridCell> getVNN(GridCell location, GridCell[][] map) {
+        HashSet<GridCell> set = new HashSet<GridCell> ();
+        //Check if up exists
+        if (location.y > 0) {    //Not on the upper border of the map
+            set.add(map[location.x][location.y - 1]);
+        }
+        //Check if down exists
+        if (location.y < map[0].length - 1) {    //Not on the bottom border of the map
+            set.add(map[location.x][location.y + 1]);
+        }
+        //Check if left exists
+        if (location.x > 0) {    //Not on the left border of the map
+            set.add(map[location.x - 1][location.y]);
+        }
+        //Check if right exists
+        if (location.x < Logic.map.length - 1) {    //Not on the right border of the map
+            set.add(map[location.x + 1][location.y]);
+        }
+        return set;
     }
 
     private static void addLeft(GridCell location, byte size) {
@@ -447,12 +520,12 @@ public class Logic {
         a[1] = -1;
         //int defensePower = 0;
 
-        //CO and Power specific bonuses for all units
+        //CO and Power general bonuses for all units
         switch (attacker.player.currentCO.id) {
             case CO.ANDY:  //Hyper repair
                 if (attacker.player.hasSuperPowerOn) {
                     //Logic.attack1 = 20;
-                    a[0] = 20;
+                    a[1] = 20;
                 }
                 break;
             case CO.COLIN: // Power of Money
@@ -492,7 +565,7 @@ public class Logic {
                     if (attacker.player.hasPowerOn) {
                         a[1] = 50;
                     }
-                    if (attacker.player.hasPowerOn) {
+                    if (attacker.player.hasSuperPowerOn) {
                         a[1] = 90;
                     }
                 }
@@ -505,7 +578,17 @@ public class Logic {
             case CO.KOAL:
                 if (attacker.location.terrain.terrainType == Terrain.ROAD) {
                     a[0] = 10;
-
+                    if (attacker.player.hasPowerOn) {
+                        a[1] = 20;
+                    }
+                    if (attacker.player.hasSuperPowerOn) {
+                        a[1] = 30;
+                    }
+                }
+                else {
+                    if (attacker.player.hasNoPower == false) {
+                        a[1] = 10;
+                    }
                 }
                 break;
         }
@@ -519,7 +602,7 @@ public class Logic {
                     if (attacker.player.hasPowerOn) {
                         a[1] = 20;
                     }
-                    //VIctory March
+                    //Victory March
                     if (attacker.player.hasSuperPowerOn) {
                         a[1] = 50;
                     }
@@ -556,159 +639,166 @@ public class Logic {
                 case CO.JESS:
                     a[0] = 10;
                     if (attacker.player.hasPowerOn) {
-                        attackP1 = 20;
+                        a[1] = 20;
                     }
                     if (attacker.player.hasSuperPowerOn) {
-                        attackP1 = 40;
+                        a[1] = 40;
                     }
                     break;
             }
-            //Indirect vehicle class
-            if (Unit.isIndirect(attacker.unitType)
-                    && Unit.isVehicle(attacker.unitType)) {
-                switch (attacker.player.currentCO.id) {
-                    case CO.MAX:
-                        a[0] = -10;
-                        break;
-                    case CO.GRIT:
-                        a[0] = 20;
-                        if (attacker.player.hasNoPower == false) {
-                            attackP1 = 30;
-                        }
-                        break;
-                    case CO.SENSEI:
-                        a[0] = -10;
-                        break;
-                    case CO.JESS:
-                        a[0] = 10;
-                        if (attacker.player.hasPowerOn) {
-                            attackP1 = 20;
-                        }
-                        if (attacker.player.hasSuperPowerOn) {
-                            attackP1 = 40;
-                        }
-                        break;
-                }
-                //Battle Copters
-                if (attacker.unitType == Unit.B_COPTER) {
-                    switch (attacker.player.currentCO.id) {
-                        case CO.SAMI:
-                            a[0] = -10;
-                            break;
-                        case CO.MAX:
-                            a[0] = 20;
-                            if (attacker.player.hasPowerOn) {
-                                attackP1 = 20;
-                            }
-                            if (attacker.player.hasSuperPowerOn) {
-                                attackP1 = 40;
-                            }
-                            break;
-                        case CO.GRIT:
-                            a[0] = -20;
-                            break;
-                        case CO.SENSEI:
-                            a[0] = 50;
-                            if (attacker.player.hasNoPower == false) {
-                                attackP1 = 25;
-                            }
-                            break;
-                        case CO.EAGLE:
-                            a[0] = 15;
-                            if (attacker.player.hasNoPower == false) {
-                                attackP1 = 15;
-                            }
-                            break;
-                        case CO.DRAKE:
-                            a[0] = -30;
-                            break;
-                        case CO.JESS:
-                            a[0] = -10;
-                            break;
+        }
+        //Indirect vehicle class
+        if (Unit.isIndirect(attacker.unitType)
+                && Unit.isVehicle(attacker.unitType)) {
+            switch (attacker.player.currentCO.id) {
+                case CO.MAX:
+                    a[0] = -10;
+                    break;
+                case CO.GRIT:
+                    a[0] = 20;
+                    if (attacker.player.hasNoPower == false) {
+                        //DEBUG
+                        System.out.println("Bonus 30% attack for Grit");
+                        a[1] = 30;
                     }
-                    //Plane Class
-                    if (Unit.isPlane(attacker.unitType)) {
-                        switch (attacker.player.currentCO.id) {
-                            case CO.SAMI:
-                                a[0] = -10;
-                                break;
-                            case CO.MAX:
-                                a[0] = 20;
-                                if (attacker.player.hasPowerOn) {
-                                    attackP1 = 20;
-                                }
-                                if (attacker.player.hasSuperPowerOn) {
-                                    attackP1 = 40;
-                                }
-                                break;
-                            case CO.GRIT:
-                                a[0] = -20;
-                                break;
-                            case CO.EAGLE:
-                                a[0] = 15;
-                                if (attacker.player.hasNoPower == false) {
-                                    attackP1 = 15;
-                                }
-                                break;
-                            case CO.DRAKE:
-                                a[0] = -30;
-                                break;
-                            case CO.JESS:
-                                a[0] = -10;
-                                break;
-                        }
-                        //Direct Sea Units
-                        if (Unit.isDirect(attacker.unitType)
-                                && Unit.isSea(attacker.unitType)) {
-                            switch (attacker.player.currentCO.id) {
-                                case CO.SAMI:
-                                    a[0] = -10;
-                                    break;
-                                case CO.MAX:
-                                    a[0] = 20;
-                                    if (attacker.player.hasPowerOn) {
-                                        attackP1 = 20;
-                                    }
-                                    if (attacker.player.hasSuperPowerOn) {
-                                        attackP1 = 40;
-                                    }
-                                    break;
-                                case CO.GRIT:
-                                    a[0] = -20;
-                                    break;
-                                case CO.EAGLE:
-                                    a[0] = -30;
-                                    break;
-                                case CO.JESS:
-                                    a[0] = -10;
-                                    break;
-                            }
-                        }
+                    break;
+                case CO.SENSEI:
+                    a[0] = -10;
+                    break;
+                case CO.JESS:
+                    a[0] = 10;
+                    if (attacker.player.hasPowerOn) {
+                        a[1] = 20;
                     }
-                    //Indirect Sea Units
-                    if (Unit.isIndirect(attacker.unitType)
-                            && Unit.isSea(attacker.unitType)) {
-                        switch (attacker.unitType) {
-                            case CO.MAX:
-                                a[0] = -10;
-                                break;
-                            case CO.GRIT:
-                                a[0] = 20;
-                                if (attacker.player.hasNoPower == false) {
-                                    a[1] = 30;
-                                }
-                                break;
-                            case CO.EAGLE:
-                                a[0] = -30;
-                                break;
-                            case CO.JESS:
-                                a[0] = -10;
-                                break;
-                        }
+                    if (attacker.player.hasSuperPowerOn) {
+                        a[1] = 40;
                     }
-                }
+                    break;
             }
         }
+        //Battle Copters
+        if (attacker.unitType == Unit.B_COPTER) {
+            switch (attacker.player.currentCO.id) {
+                case CO.SAMI:
+                    a[0] = -10;
+                    break;
+                case CO.MAX:
+                    a[0] = 20;
+                    if (attacker.player.hasPowerOn) {
+                        a[1] = 20;
+                    }
+                    if (attacker.player.hasSuperPowerOn) {
+                        a[1] = 40;
+                    }
+                    break;
+                case CO.GRIT:
+                    a[0] = -20;
+                    break;
+                case CO.SENSEI:
+                    a[0] = 50;
+                    if (attacker.player.hasNoPower == false) {
+                        a[1] = 25;
+                    }
+                    break;
+                case CO.EAGLE:
+                    a[0] = 15;
+                    if (attacker.player.hasNoPower == false) {
+                        a[1] = 15;
+                    }
+                    break;
+                case CO.DRAKE:
+                    a[0] = -30;
+                    break;
+                case CO.JESS:
+                    a[0] = -10;
+                    break;
+            }
+        }
+        //Plane Class
+        if (Unit.isPlane(attacker.unitType)) {
+            switch (attacker.player.currentCO.id) {
+                case CO.SAMI:
+                    a[0] = -10;
+                    break;
+                case CO.MAX:
+                    a[0] = 20;
+                    if (attacker.player.hasPowerOn) {
+                        a[1] = 20;
+                    }
+                    if (attacker.player.hasSuperPowerOn) {
+                        a[1] = 40;
+                    }
+                    break;
+                case CO.GRIT:
+                    a[0] = -20;
+                    break;
+                case CO.EAGLE:
+                    a[0] = 15;
+                    if (attacker.player.hasNoPower == false) {
+                        a[1] = 15;
+                    }
+                    break;
+                case CO.DRAKE:
+                    a[0] = -30;
+                    break;
+                case CO.JESS:
+                    a[0] = -10;
+                    break;
+            }
+        }
+        //Direct Sea Units
+        if (Unit.isDirect(attacker.unitType)
+                && Unit.isSea(attacker.unitType)) {
+            switch (attacker.player.currentCO.id) {
+                case CO.SAMI:
+                    a[0] = -10;
+                    break;
+                case CO.MAX:
+                    a[0] = 20;
+                    if (attacker.player.hasPowerOn) {
+                        a[1] = 20;
+                    }
+                    if (attacker.player.hasSuperPowerOn) {
+                        a[1] = 40;
+                    }
+                    break;
+                case CO.GRIT:
+                    a[0] = -20;
+                    break;
+                case CO.EAGLE:
+                    a[0] = -30;
+                    break;
+                case CO.JESS:
+                    a[0] = -10;
+                    break;
+            }
+        }
+        //Indirect Sea Units
+        if (Unit.isIndirect(attacker.unitType)
+                && Unit.isSea(attacker.unitType)) {
+            switch (attacker.player.currentCO.id) {
+                case CO.MAX:
+                    a[0] = -10;
+                    break;
+                case CO.GRIT:
+                    a[0] = 20;
+                    //DEBUG
+                    if (attacker.player.hasNoPower == false) {
+                        System.out.println("Bonus 30% attack on Battleships for Grit");
+                        a[1] = 30;
+                    }
+                    break;
+                case CO.EAGLE:
+                    a[0] = -30;
+                    break;
+                case CO.JESS:
+                    a[0] = -10;
+                    break;
+            }
+        }
+        //DEBUG        
+        System.out.println("Attack1:" + a[0]);
+        System.out.println("AttackP1:" + a[1]);
         return a;
     }
 
@@ -718,11 +808,12 @@ public class Logic {
         d[0] = 0;
         //defenseP2
         d[1] = 0;
-        //defenseStars
+        //defenseStars: terrainD2
         d[2] = 0;
+
+        //Set terrain defenseStars for defender
+        d[2] = defender.location.terrain.defenseStars;
         if (defender.player.hasNoPower == false) {
-            //Set terrain defenseStars for defender
-            d[2] = defender.location.terrain.defenseStars;
             //if anyone has any power, 110% of defense
             switch (defender.player.currentCO.id) {
                 case CO.ANDY:
@@ -741,7 +832,6 @@ public class Logic {
                 case CO.ADDER:
                 case CO.HAWKE:
                 case CO.KINDLE:
-
                     d[1] = 10;
                     break;
             }
@@ -792,20 +882,57 @@ public class Logic {
                     break;
             }
         }
+        //No defense for Air units
+        if (defender.isAir(defender.unitType)) {
+            //DEBUG
+            System.out.println("Defender is AIR");
+            d[2] = 0;
+        }
+        //DEBUG        
+        System.out.println("Defense2:" + d[0]);
+        System.out.println("DefenseP2:" + d[1]);
+        System.out.println("DefenseStars for P2:" + d[2]);
         return d;
     }
 
+    /**
+     * Calculates the damage inflicted by an attacking unit to a defending unit,
+     * taking into account all aspects of combat, such as HP, terrain, ammo,
+     * primary or secondary weapon. The damage does not account for
+     * counterattack. This reflects de estimated damage that pops on the GBA
+     * game, when about to engage another unit.
+     *
+     * @param attacker
+     * @param defender
+     * @param a
+     * @param d
+     * @return
+     */
     public static double calculateDamage(Unit attacker, Unit defender, int a[], int d[]) {
-        return Math.floor(
+        double damage = Math.floor(
                 Unit.getDamageByChart(attacker, defender)
                 * (100
-                - ((d[2] * defender.currentHP) + d[0] + d[1]))
-                //Defense for-each hp-defender
+                //-Defense for-each hp-defender
                 //+ standard bonus defense + Power/Super Defense
+                - ((d[2] * defender.currentHP) + d[0] + d[1]))
                 * (attacker.currentHP / 10) //
                 * (100 + a[0] + a[1]) / 10000);
+        //DEBUG
+        System.out.println("Damage without luck: " + damage);
+        return damage;
     }
 
+    /**
+     * The luck filter receives a damage value, previously calculated on
+     * calculateDamage method, and returns a new damage value, corrected for
+     * luck of the attacking CO and randomness. This is the final damage value
+     * that must be substracted from the defender's HP, such as 'new Defender HP
+     * = Defender HP - (damage/10)'
+     *
+     * @param attacker The attacking unit
+     * @param damage   A damage value, accounted for CO luck and randomness
+     * @return
+     */
     public static double luckFilter(Unit attacker, double damage) {
         switch (attacker.player.currentCO.id) {
             case CO.NELL:
@@ -848,7 +975,187 @@ public class Logic {
                 tempdamage = Math.ceil(damage / 10) * 10;
             }
         }
+        //DEBUG
+        System.out.println("Damage with luck: " + tempdamage);
         return tempdamage;
+    }
+
+    /**
+     * This method is responsible of executing all the combat operations
+     * involving an attacking and a defending unit. The combat mechanics involve
+     * damage calculation inflicted on the defender by the attacker, passing
+     * that value through the luck filter, substracting the resulting damage to
+     * the defender HP.
+     *
+     * NOTE that counterattack is also to be calculated, only if: a) The
+     * attacker is not indirect AND b) The defender is not indirect (a defending
+     * indirect can't counterattack) AND c) The defender can actually engage its
+     * attacker (as known by invoking the getEngagingWeapon method on the Unit
+     * class) AND the defender was not wiped out by the initial damage
+     * calculation.
+     *
+     * To calculate the counterattack, now the defender is the attacker, with
+     * its new HP value, and the attacker becomes the defender, with its
+     * original HP value.
+     *
+     * Also, ammunition must be substracted if the attacker and/or the defender
+     * used their primary weapon during combat.
+     *
+     * This method modifies the Unit objects by reference. If a unit or units
+     * result destroyed as a result of combat, be sure to TAKE ALL MEASURES to
+     * properly REMOVE THE UNIT FROM THE GAME.
+     *
+     * @param attacker The attacking unit engaged in combat.
+     * @param defender The defending unit engaged in combat.
+     * 
+     * @return The damage inflicted from the attacker to the defender.
+     */
+    public static short combat(Unit attacker, Unit defender, boolean luck) {
+        //CHECK FOR SONJA's condition for COUNTER BREAK BONUS: attack first when defending.
+
+        /*IF THE DEFENDER IS SONJA, and SUPERPOWER IS ON:
+         * "COUNTER BREAK"
+         *  IF SONJA'S UNIT (defender) IS DIRECT
+         *      IF SONJA UNIT (defender) CAN ENGAGE ATTACKING UNIT:
+         *          //THE DEFENDER BECOMES THE ATTACKER.
+         *              INVERT ROLES AND CALCULATE DAMAGE AS USUAL:
+         *              - DEFENDER BECOMES ATTACKER.
+         *              - ATTACKER BECOMES DEFENDER.
+         *              According to the rules established, it hypotetically shoud be right
+         *  ELSE
+         *      Proceed as ussual, as indirects can't counterattack
+         * 
+         */
+
+        //DEBUG: STATS
+        System.out.println("Attacker: " + attacker.toString());
+        System.out.println("Defender: " + defender.toString());
+        
+        //Check for Sonja
+        if (defender.player.currentCO.id == CO.SONJA
+                && defender.player.hasSuperPowerOn
+                && Unit.isDirect(defender.unitType)
+                && Unit.getEngagingWeapon(defender, attacker) != Unit.CANT_ENGAGE) {
+            //COUNTER BREAK: SONJA attacks first when attacked
+            Unit temp = attacker;
+            attacker = defender;
+            defender = temp;
+        }
+        //SUBSTRACT AMMO
+        switch (Unit.getEngagingWeapon(attacker, defender)) {
+            case Unit.PRIMARY_WEAPON:
+                attacker.currentAmmo--;
+            case Unit.SECONDARY_WEAPON:
+                //Calculate new HP for defender
+                double damageDealt = Logic.calculateDamage(attacker,
+                                                           defender,
+                                                           Logic.getAttackingBonusesAndPenalties(attacker),
+                                                           Logic.getDefensiveBonusesAndPenalties(defender));
+                if (luck) {
+                    damageDealt = (short) (Logic.luckFilter(attacker, damageDealt) / 10);
+                }
+                else {
+                    damageDealt = damageDealt / 10;
+                    //DEBUG
+                    System.out.println("Damage adjusted for HP: " + damageDealt);
+                }
+                damageDealt = (short) Math.round(damageDealt);
+                double defenderHP = defender.currentHP - (damageDealt);
+
+                //DEBUG        
+                System.out.println("Damage dealt to defender(double): " + damageDealt);
+                System.out.println("Defender HP after attack (double): " + defenderHP);
+
+                if (defenderHP < 0) {
+                    defenderHP = 0;
+                }
+                else {
+                    //If counterattack is possible
+                    //DEBUG
+                    System.out.println("Start counterattack calculation");
+                    if (Unit.isDirect(attacker.unitType)
+                            && Unit.isDirect(defender.unitType)
+                            && Unit.getEngagingWeapon(defender, attacker) != Unit.CANT_ENGAGE) {
+
+                        //SUBSTRACT AMMO
+                        if (Unit.getEngagingWeapon(defender, attacker) == Unit.PRIMARY_WEAPON) {
+                            defender.currentAmmo--;
+                        }
+
+                        //Calculate basic counterattack: Inversed parameters for normal attack
+                        double counterDamage = Logic.calculateDamage(defender,
+                                                                     attacker,
+                                                                     Logic.getAttackingBonusesAndPenalties(defender),
+                                                                     Logic.getDefensiveBonusesAndPenalties(attacker));
+                        //Check for counterattack related bonuses
+                        switch (defender.player.currentCO.id) {
+                            case CO.SONJA:
+                                //150% counterattack day-to-day ability
+                                counterDamage *= 1.5;
+                            case CO.KANBEI:
+                                if (attacker.player.hasSuperPowerOn) {
+                                    //Counterattack bonus for Samurai Spirit
+                                    counterDamage *= 1.5;
+                                }
+                        }
+                        if (luck) {
+                            counterDamage = Logic.luckFilter(defender, counterDamage) / 10;
+                        }
+                        else {
+                            counterDamage = Math.round(counterDamage / 10);
+                        }
+                        double attackerHP = attacker.currentHP - counterDamage;
+                        if (attackerHP < 0) {
+                            //Attacker was destroyed
+                            attacker.currentHP = 0;
+                        }
+                        attacker.currentHP = (byte) attackerHP;
+                    }
+                }
+                defender.currentHP = (byte) defenderHP;
+                //DEBUG
+                System.out.println("Attacker HP after combat (byte): " + attacker.currentHP);
+                System.out.println("Defender HP after combat (byte): " + defender.currentHP);
+
+                return (short) damageDealt;
+            case Unit.CANT_ENGAGE:
+            default:
+                return 0;
+        }
+        //MISSING: Destroy UNIT IF DEFEATED
+        //ALSO: THIS METHOD COULD RETURN AN OUTCOME OBJECT, LIKE A SIZE 2 ARRAY, with OWN and ENEMY HPs stored
+        //      to be used on the search tree
+        //ALSO
+        //TAKE INTO ACCOUNT THE DISTINCT CRITERIA FOR THE EVALUATION FUNCTION; INSTEAD OF JUST ONE
+        //      To add it as an additional dimension of the study
+        //          taking into account that each eval function renders different search tree outcomes
+    }
+
+    /**
+     * This method engages clones of an attacking and defending unit, sent as
+     * parameters, to estimate the outcome of a battle. It returns a size-3
+     * array, representing the outcome of a combat as: 0) (Enemy) Defender HP
+     * after combat, 1) (Own) Attacker HP after combat, and 2) The damage dealt
+     * by the attacker to the defender, expresed in percentage.
+     *
+     * @param attacker
+     * @param defender
+     * @return
+     */
+    public static short[] combatSimulation(Unit attacker, Unit defender) {
+        //Cloning units
+        Unit a = Unit.cloneUnit(attacker);
+        Unit d = Unit.cloneUnit(defender);
+        //Engaging in "simulated" combat
+        short damage = combat(a, d, false);
+        //Take HP
+        byte dHP = d.currentHP;
+        byte aHP = a.currentHP;
+        //Kill clones, then call garbage collector if necessary
+        a = null;
+        d = null;
+        //Returning the outcome
+        return new short[]{dHP, aHP, damage};
     }
 
     public static LinkedList<DijkstraElement> calculateMovementRadiusUsingAStar(Unit unit, GridCell map[][]) {
@@ -917,7 +1224,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x][location.y - 1].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x][location.y - 1].unit.player.team != Logic.unit1.player.team) {
@@ -992,7 +1299,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x - 1][location.y].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x - 1][location.y].unit.player.team != Logic.unit1.player.team) {
@@ -1066,7 +1373,7 @@ public class Logic {
                 //Add nothing, as source GridCell can't be a destiny
                 return;
             }
-            //If there is a enemy or friend unit on the destination
+            //If there is an enemy or friend unit on the destination
             if (Logic.map[location.x][location.y + 1].unit != null) {
                 //If the unit is not an ally one
                 if (Logic.map[location.x][location.y + 1].unit.player.team != Logic.unit1.player.team) {
@@ -1143,7 +1450,7 @@ public class Logic {
                     //Add nothing, as source GridCell can't be a destiny
                     return;
                 }
-                //If there is a enemy or friend unit on the destination
+                //If there is an enemy or friend unit on the destination
                 if (Logic.map[location.x + 1][location.y].unit != null) {
                     //If the unit is not an ally one
                     if (Logic.map[location.x + 1][location.y].unit.player.team != Logic.unit1.player.team) {

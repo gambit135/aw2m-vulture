@@ -27,7 +27,7 @@ public class Main {
             }
         }
         try {
-            ClassLoader.getSystemClassLoader().loadClass("aw2m.Unit");
+            ClassLoader.getSystemClassLoader().loadClass("aw2m.common.core.Unit");
         }
         catch (ClassNotFoundException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

@@ -6,12 +6,3 @@
 /.idea
 /*.iml
 /*.lnk
-/src/main/java/aw2m/creator/maploader/remote/
-/src/main/java/aw2m/creator/
-/src/main/java/aw2m/
-!/src/main/java/aw2m/common/factory/
-!/src/main/java/aw2m/common/alphabeta/
-!/src/main/java/aw2m/common/stats/
-!/src/main/java/aw2m/common/serialize/
-!/src/main/java/aw2m/remote/endpoint/
-!/src/main/java/aw2m/common/core/

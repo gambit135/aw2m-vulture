@@ -101,7 +101,6 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
         //Register time before doing stuff
         Date beforeProcessing = new Date();
-        Calendar calendarBefore = Calendar.getInstance();
         //Do something with the received parameters.
         
         
@@ -113,7 +112,6 @@ public class DeserializeEndpointServlet extends HttpServlet {
 
         
         Date afterProcessing = new Date();
-        Calendar calendarAfter = Calendar.getInstance();
         try {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
@@ -122,7 +120,8 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
-            out.println("<h2>Server time & date: " + afterProcessing + "</h2>");
+            out.println("<h2>Server time before processing: " + beforeProcessing + "</h2>");
+            out.println("<h2>Server time after processing: " + afterProcessing + "</h2>");
 
             out.println("<ul>");
 
@@ -175,7 +174,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
                 for (String value : values) {
                     out.println("<li>Value: " + value);
                     int oh = Statistic.calculateByteSizeOfStringOverhead(value);
-                    int size = Statistic.calculateByteSizeofString(value);
+                    int size = Statistic.calculateByteSizeOfString(value);
                     out.println("<br>String size (bytes): " + Integer.toString(size));
                     out.println("<br>String size overhead (bytes): " + oh);
                     out.println("</li>");

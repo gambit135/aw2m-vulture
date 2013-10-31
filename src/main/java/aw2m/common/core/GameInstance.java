@@ -72,8 +72,6 @@ public class GameInstance {
         //Map is ready to be played. Set first turn
         this.currentPlayer = players[1];
         this.currentPlayerID = 1;
-        //Start playing
-        //Game.play();         
     }
 
     /**

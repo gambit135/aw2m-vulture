@@ -23,7 +23,7 @@ public class TestMapLoader {
                 map[i][j].y = j;
             }
         }
-        GameInstance game = new GameInstance();
+        GameInstance game = new GameInstance(MapCatalog.SPANN_ISLAND);
         MapLoader.game = game;
         System.out.println("Testing remote load file");
         System.out.println("sizeX " + MapLoader.sizeX);

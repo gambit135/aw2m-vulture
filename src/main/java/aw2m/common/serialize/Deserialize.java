@@ -56,12 +56,15 @@ public class Deserialize {
                         }
                         break;
                     case 1:
+                        /*
                         if (!rawDSV.equals("n")) {
                             playerObject.teamSymbol = rawDSV;
                         }
                         else {
                             playerObject.teamSymbol = null;
                         }
+                        */
+                        playerObject.team = Byte.parseByte(rawDSV);
                         break;
                     case 2:
                         playerObject.currentCO = new CO(Byte.parseByte(rawDSV));
@@ -287,12 +290,8 @@ public class Deserialize {
         //Prints each unit for each player
         for (Player p : players) {
             System.out.println("Units for Player " + p.id);
-            for (Unit u : p.units) {
-                System.out.println("UnitType: " + u.unitType
-                        + ", HP: " + u.currentHP
-                        + ", Fuel: " + u.currentFuel
-                        + ", CurrentAmmo: " + u.currentAmmo
-                        + " @ (" + u.location.x + ", " + u.location.y + ")");
+            for (Unit u : p.units) {               
+                System.out.println(u.toString());
             }
         }
     }

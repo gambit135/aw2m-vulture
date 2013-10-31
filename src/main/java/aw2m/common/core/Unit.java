@@ -1,7 +1,5 @@
 package aw2m.common.core;
 
-import java.util.Set;
-
 /**
  * @author Alejandro Téllez G <java.util.fck@hotmail.com>
  */
@@ -73,8 +71,21 @@ public class Unit {
     public static final byte SUB = 22;
     public static final byte BLACK_BOAT = 23;
     public static final byte CARRIER = 24;
+    /**
+     * Secondary units.
+     */
     public static final byte BUILDING = 25;
     public static final byte OOZIUM = 26;
+    /**
+     * Primary Weapon.
+     */
+    public static final byte PRIMARY_WEAPON = 2;
+    public static final byte SECONDARY_WEAPON = 1;
+    public static final byte CANT_ENGAGE = 0;
+
+    private static byte getDamageByChartAW(Unit attacker, Unit defender) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
     //Data relative to each individual unit
     /**
      * unitType: One of the 18 units available (in AW2)
@@ -151,6 +162,32 @@ public class Unit {
     public Unit(byte unitType, byte HP, Player player, byte currentFuel, byte currentAmmo, boolean hasMoved, GridCell location) {
         this(unitType, HP, player, currentFuel, hasMoved, location);
         this.currentAmmo = currentAmmo;
+    }
+
+    /**
+     * This method returns a clone of an original Unit object, sent as
+     * parameter. The method accounts for all the attributes of the original to
+     * be passed unto the clone, primitive datatypes as well as references to
+     * other objects. The resulting clone does not in any way replace the
+     * original unit: e.g., if the original is referenced by a GridCell object,
+     * the reference shall remain unchanged and won't, at any point, change its
+     * reference to the new clone object.
+     *
+     * This method should provide handy when creating nodes on the search tree,
+     * to simulate combat outcomes.
+     *
+     * @param original The unit to be cloned
+     * @return A new Unit object: a clone of the original unit.
+     */
+    public static Unit cloneUnit(Unit original) {
+        Unit clone = new Unit(original.unitType,
+                              original.currentHP,
+                              original.player,
+                              original.currentFuel,
+                              original.currentAmmo,
+                              original.hasMoved,
+                              original.location);
+        return clone;
     }
 
     public void onSelect() {
@@ -261,38 +298,211 @@ public class Unit {
         return -1;
     }
 
+    public static short getUnitCost(byte unitType) {
+        switch (unitType) {
+            case Unit.INFANTRY:
+                return 1000;
+            case Unit.MECH:
+                return 3000;
+            case Unit.RECON:
+                return 4000;
+            case Unit.TANK:
+                return 7000;
+            case Unit.MD_TANK:
+                return 16000;
+            case Unit.NEOTANK:
+                return 22000;
+            case Unit.MEGATANK:
+                return 28000;
+            case Unit.APC:
+                return 5000;
+            case Unit.ARTILLERY:
+                return 6000;
+            case Unit.ROCKETS:
+                return 15000;
+            case Unit.ANTI_AIR:
+                return 8000;
+            case Unit.MISSILES:
+                return 12000;
+            case Unit.PIPERUNNER:
+                return 20000;
+            case Unit.FIGHTER:
+                return 20000;
+            case Unit.BOMBER:
+                return 22000;
+            case Unit.B_COPTER:
+                return 9000;
+            case Unit.T_COPTER:
+                return 5000;
+            case Unit.STEALTH:
+                return 24000;
+            case Unit.BLACK_BOMB:
+                return 25000;
+            case Unit.BATTLESHIP:
+                return 28000;
+            case Unit.CRUISER:
+                return 18000;
+            case Unit.LANDER:
+                return 12000;
+            case Unit.SUB:
+                return 20000;
+            case Unit.BLACK_BOAT:
+                return 7500;
+            case Unit.CARRIER:
+                return 30000;
+        }
+        return -1;
+    }
+
+    public static byte getUnitCostFactor(byte unitType) {
+        return (byte) (Math.round(Unit.getUnitCost(unitType) / 1000));
+    }
+
+    public static String getUnitName(byte unitType) {
+        switch (unitType) {
+            case Unit.INFANTRY:
+                return "Infantry";
+            case Unit.MECH:
+                return "Mech";
+            case Unit.RECON:
+                return "Recon";
+            case Unit.TANK:
+                return "Tank";
+            case Unit.MD_TANK:
+                return "Md. Tank";
+            case Unit.NEOTANK:
+                return "Neotank";
+            case Unit.MEGATANK:
+                return "Megatank";
+            case Unit.APC:
+                return "APC";
+            case Unit.ARTILLERY:
+                return "Artillery";
+            case Unit.ROCKETS:
+                return "Rockets";
+            case Unit.ANTI_AIR:
+                return "A-Air";
+            case Unit.MISSILES:
+                return "Missiles";
+            case Unit.PIPERUNNER:
+                return "Piperunner";
+            case Unit.FIGHTER:
+                return "Fighter";
+            case Unit.BOMBER:
+                return "Bomber";
+            case Unit.B_COPTER:
+                return "B Cptr";
+            case Unit.T_COPTER:
+                return "T-Cptr";
+            case Unit.STEALTH:
+                return "Stealth";
+            case Unit.BLACK_BOMB:
+                return "Black Bomb";
+            case Unit.BATTLESHIP:
+                return "Battleship";
+            case Unit.CRUISER:
+                return "Cruiser";
+            case Unit.LANDER:
+                return "Lander";
+            case Unit.SUB:
+                return "Sub";
+            case Unit.BLACK_BOAT:
+                return "Black Boat";
+            case Unit.CARRIER:
+                return "Carrier";
+        }
+        return "";
+    }
+
     /**
      * Returns true if an attacking unit can engage in combat with a defender
      * unit, regardless of which weapon is used by the attacker; also ignoring
-     * if the attacker can fight back. An example can be an A-Air enganging a
+     * if the defender can fight back. An example can be an A-Air enganging a
      * Fighter. The fighter cannot engage ground units.
      *
      * @param attacker
      * @param defender
      * @return
      */
-    public static boolean canEngage(Unit attacker, Unit defender) {
-        return false;
+    /*public static boolean canEngage(Unit attacker, Unit defender) {
+     return false;
+     }*/
+    /**
+     * Returns the weapon that the attacker can use against the defener, with
+     * priority to its primary weapon; NOTE THAT the value returned by this
+     * method takes unto account the circumstance of the game, more
+     * specifically: if the attacker has or has not ammo. This is, if the
+     * attacker can use its primary weapon, it returs the constant value
+     * PRIMARY_WEAPON. If it can't, but can use its secondary weapon, this
+     * method returns the SECONDARY_WEAPON value. If the attacker can't engange
+     * the defender with either weapons, a CANT_ENGAGE value is returned.
+     *
+     *
+     * @param attacker
+     * @param defender
+     * @return
+     */
+    public static byte getEngagingWeapon(Unit attacker, Unit defender) {
+        //If the attacker has primary weapon
+        if (Unit.getTotalAmmo(attacker.unitType) > 0) {
+            //If the attacker has ammo
+            if (attacker.currentAmmo > 0) {
+                //test if it can attack with primary
+                if (Unit.canEngageUnitClassUsingPrimaryWeapon(attacker.unitType, defender.unitType)) {
+                    return Unit.PRIMARY_WEAPON;
+                }
+            }
+            //At this point, it can't use primary, so try asking for secondary
+            if (Unit.canEngageUnitClassUsingSecondaryWeapon(attacker.unitType, defender.unitType)) {
+                return Unit.SECONDARY_WEAPON;
+            }
+        }
+        //If it can't use either, it can't engage.
+        return Unit.CANT_ENGAGE;
     }
 
     /**
-     * Return true if a unit can attack another with it's primary weapon, based
-     * on the unit class restrictions imposed by game's logic. E.g., a T Copter
-     * can attach Cptr clas, with Hydra missiles.
+     * Returns if an attacking unit can, hypothetically, engage an enemy
+     * defending unit.
      *
-     * @param atacker
-     * @param defender The unit which class will be determiend, in order to know
-     *                 if it can be attacked by the attacker's primary weapon.
+     * @param attacker
+     * @param defender
      * @return
      */
-    public static boolean canAttackUnitClassWithPrimaryWeapon(Unit attacker, Unit defender) {
-        //Switch
-        switch (attacker.unitType) {
-            //Infantry only uses secondary weapon
+    public static byte getEngagingWeapon(byte attacker, byte defender) {
+        //If the attacker has primary weapon
+        //test if it can attack with primary
+        if (Unit.canEngageUnitClassUsingPrimaryWeapon(attacker, defender)) {
+            return Unit.PRIMARY_WEAPON;
+        }
+        //At this point, it can't use primary, so try asking for secondary
+        if (Unit.canEngageUnitClassUsingSecondaryWeapon(attacker, defender)) {
+            return Unit.SECONDARY_WEAPON;
+        }
+        //If it can't use either, it can't engage.
+        return Unit.CANT_ENGAGE;
+    }
+
+    /**
+     * Return true if a unit can attack another with its primary weapon, based
+     * on the unit class restrictions imposed by game's logic, but not by
+     * circumstances such as ammo. E.g., a T Copter can attach Cptr clas, with
+     * Hydra missiles.
+     *
+     * @param atacker  The attacking unit.
+     * @param defender The unit which class will be determiend, in order to know
+     *                 if it can be attacked by the attacker's primary weapon.
+     * @return True if the attacking unit can engage the defender unit using its
+     *         primary weapon. False otherwise.
+     */
+    public static boolean canEngageUnitClassUsingPrimaryWeapon(byte attacker, byte defender) {
+        //Switch to determine attacking unit class
+        switch (attacker) {
             case Unit.INFANTRY:
+                //Infantry only use secondary weapon
                 return false;
             case Unit.MECH:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.VEH_CLASS:
                         return true;
                 }
@@ -304,7 +514,7 @@ public class Unit {
             case Unit.MD_TANK:
             case Unit.NEOTANK:
             case Unit.MEGATANK:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.VEH_CLASS:
                     case Unit.SUB_CLASS:
                     case Unit.SHIP_CLASS:
@@ -315,7 +525,7 @@ public class Unit {
                 //APC has no guns
                 return false;
             case Unit.ARTILLERY:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.INFTRY_CLASS:
                     case Unit.VEH_CLASS:
                     case Unit.SHIP_CLASS:
@@ -324,7 +534,7 @@ public class Unit {
                 }
                 return false;
             case Unit.ROCKETS:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.INFTRY_CLASS:
                     case Unit.VEH_CLASS:
                     case Unit.SHIP_CLASS:
@@ -333,7 +543,7 @@ public class Unit {
                 }
                 return false;
             case Unit.ANTI_AIR:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.INFTRY_CLASS:
                     case Unit.VEH_CLASS:
                     case Unit.CPTR_CLASS:
@@ -342,23 +552,26 @@ public class Unit {
                 }
                 return false;
             case Unit.MISSILES:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                //Can only hit air units
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.CPTR_CLASS:
                     case Unit.PLANE_CLASS:
                         return true;
                 }
                 return false;
             case Unit.PIPERUNNER:
+                //Piperunners can hit anything
                 return true;
             case Unit.FIGHTER:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                //Fighters can only engage other air units
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.CPTR_CLASS:
                     case Unit.PLANE_CLASS:
                         return true;
                 }
                 return false;
             case Unit.BOMBER:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.INFTRY_CLASS:
                     case Unit.VEH_CLASS:
                     case Unit.SHIP_CLASS:
@@ -367,7 +580,7 @@ public class Unit {
                 }
                 return false;
             case Unit.B_COPTER:
-                switch (Unit.getUnitClass(defender.unitType)) {
+                switch (Unit.getUnitClass(defender)) {
                     case Unit.VEH_CLASS:
                     case Unit.SHIP_CLASS:
                     case Unit.SUB_CLASS:
@@ -375,34 +588,141 @@ public class Unit {
                 }
                 return false;
             case Unit.T_COPTER:
+                //Transport copters carry no guns
                 return false;
             case Unit.STEALTH:
-
-                break;
+                //Omni missiles can hit anything
+                return true;
             case Unit.BLACK_BOMB:
-
-                break;
+                //Left out
+                return false;
             case Unit.BATTLESHIP:
-
-                break;
+                //Battleships can bomb on anything but air units
+                switch (Unit.getUnitSuperClass(defender)) {
+                    case Unit.AIR_CLASS:
+                        return false;
+                }
+                return true;
             case Unit.CRUISER:
-
-                break;
+                //Cruisers can engage only subs with their torpedos
+                switch (Unit.getUnitClass(defender)) {
+                    case Unit.SUB_CLASS:
+                        return true;
+                }
+                return false;
             case Unit.LANDER:
-
-                break;
+                //Lander has no guns
+                return false;
             case Unit.SUB:
-
-                break;
+                //Subs can only attack sea units
+                switch (Unit.getUnitSuperClass(defender)) {
+                    case Unit.SEA_CLASS:
+                        return true;
+                }
+                return false;
             case Unit.BLACK_BOAT:
-
-                break;
+                //Black boat has no guns
+                return false;
             case Unit.CARRIER:
-
-                break;
+                //Carriers can take down air units from the distance
+                switch (Unit.getUnitSuperClass(defender)) {
+                    case Unit.AIR_CLASS:
+                        return true;
+                }
+                return false;
             case Unit.OOZIUM:
+                //OOZIUM is left out
+                return false;
+        }
+        return false;
+    }
 
-                break;
+    /**
+     * Return true if a unit can attack another with its primary weapon, based
+     * on the unit class restrictions imposed by game's logic, but not by
+     * circumstances such as ammo. E.g., a Tank unit can attack an Infantry unit
+     * with its machine gun.
+     *
+     * @param atacker  The attacking unit.
+     * @param defender The unit which class will be determiend, in order to know
+     *                 if it can be attacked by the attacker's secondary weapon.
+     * @return True if the attacking unit can engage the defender unit using its
+     *         secondary weapon. False otherwise.
+     */
+    public static boolean canEngageUnitClassUsingSecondaryWeapon(byte attacker, byte defender) {
+        //Switch to determine attacking unit class
+        switch (attacker) {
+            //Infantry only can use its machine gun against other inftry, vehicles and copters.
+            case Unit.INFANTRY:
+            //Same as infantry for mechs
+            case Unit.MECH:
+            //Same as mechs for recons
+            case Unit.RECON:
+            //And the same for all the tanks
+            case Unit.TANK:
+            case Unit.MD_TANK:
+            case Unit.NEOTANK:
+            case Unit.MEGATANK:
+                switch (Unit.getUnitClass(defender)) {
+                    case Unit.INFTRY_CLASS:
+                    case Unit.VEH_CLASS:
+                    case Unit.CPTR_CLASS:
+                        return true;
+                }
+                return false;
+            //The rest of land units has no secondary gun
+            case Unit.APC:
+            case Unit.ARTILLERY:
+            case Unit.ROCKETS:
+            case Unit.ANTI_AIR:
+            case Unit.MISSILES:
+            case Unit.PIPERUNNER:
+                return false;
+            //Nor fighters and bombers
+            case Unit.FIGHTER:
+            case Unit.BOMBER:
+                return false;
+            //Same as inftry for copters
+            case Unit.B_COPTER:
+                switch (Unit.getUnitClass(defender)) {
+                    case Unit.INFTRY_CLASS:
+                    case Unit.VEH_CLASS:
+                    case Unit.CPTR_CLASS:
+                        return true;
+                }
+                return false;
+            case Unit.T_COPTER:
+                //Transport copters carry no guns
+                return false;
+            case Unit.STEALTH:
+                //No secondaries for stealth
+                return false;
+            case Unit.BLACK_BOMB:
+                //Left out
+                return false;
+            case Unit.BATTLESHIP:
+                return false;
+            case Unit.CRUISER:
+                //Cruisers can engage air units with its machine guns
+                switch (Unit.getUnitSuperClass(defender)) {
+                    case Unit.AIR_CLASS:
+                        return true;
+                }
+                return false;
+            case Unit.LANDER:
+                //Lander has no guns
+                return false;
+            case Unit.SUB:
+                //Subs has no secondary weapon
+                return false;
+            case Unit.BLACK_BOAT:
+                //Black boat has no guns
+                return false;
+            case Unit.CARRIER:
+                return false;
+            case Unit.OOZIUM:
+                //OOZIUM is left out
+                return false;
         }
         return false;
     }
@@ -454,6 +774,7 @@ public class Unit {
             case Unit.MISSILES:
             case Unit.PIPERUNNER:
             case Unit.CARRIER:
+            case Unit.BATTLESHIP:
                 return true;
         }
         return false;
@@ -502,8 +823,6 @@ public class Unit {
     public static boolean isSea(byte unitType) {
         if (unitType >= Unit.BATTLESHIP && unitType <= Unit.CARRIER) {
             return true;
-
-
         }
         return false;
 
@@ -737,22 +1056,18 @@ public class Unit {
         return movement;
     }
 
-    public static byte getDamageByChart(Unit attacker, Unit defender) {
-        if (GlobalSettings.awChart) {
-            return Unit.getDamageByChartAW(attacker, defender);
-        }
-        if (GlobalSettings.aw2Chart) {
-            return Unit.getDamageByChartAW2(attacker, defender);
-        }
-        if (GlobalSettings.awdsChart) {
-            return Unit.getDamageByChartAWDS(attacker, defender);
-        }
-        return -1;
-    }
-
-    public static Set<GridCell> getIndirectDeathZone(Unit unit) {
-
-        return null;
+    public static short getDamageByChart(Unit attacker, Unit defender) {
+        //if (GlobalSettings.awChart) {
+        return Unit.getDamageByChartAW2(attacker, defender);
+        /*}
+         if (GlobalSettings.aw2Chart) {
+         return Unit.getDamageByChartAW2(attacker, defender);
+         }
+         if (GlobalSettings.awdsChart) {
+         return Unit.getDamageByChartAWDS(attacker, defender);
+         }
+         */
+        //return -1;
     }
 
     public static byte getMinIndirectRange(Unit unit) {
@@ -811,24 +1126,227 @@ public class Unit {
     }
 
     /**
+     * This method determines wether an attacking unit can use its primary or
+     * secondary weapon against a defending unit; returns true if the attacker
+     * can use its primary weapon, or false otherwise.
+     *
+     * Determining wether or not a primary weapon can be used depends on several
+     * factors:
+     *
+     * 1st: If the attacker can use the primary weapon against the defender by
+     * definition.
+     *
+     * 2nd: The ammunition on the attacker's primary weapon.
      *
      * @param attacker
      * @param Defender
      * @return
      */
-    public static boolean usesPrimaryWeapon(Unit attacker, Unit Defender) {
-
+    public static boolean canUsePrimaryWeapon(Unit attacker, Unit defender) {
+        if (attacker.currentAmmo <= 0) {
+            return false;
+        }
+        switch (attacker.unitType) {
+            case Unit.INFANTRY:
+                //Infantry units don't have primary weapon
+                return false;
+            case Unit.MECH:
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.RECON:
+                //Recons don't have primary weapon
+                return false;
+            case Unit.TANK:
+            case Unit.MD_TANK:
+            case Unit.NEOTANK:
+            case Unit.MEGATANK:
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.INFTRY_CLASS:
+                        return false;
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.CPTR_CLASS:
+                        return false;
+                    case Unit.PLANE_CLASS:
+                        return false;
+                    case Unit.SHIP_CLASS:
+                        return true;
+                    case Unit.SUB_CLASS:
+                        return true;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                }
+                break;
+            case Unit.APC:
+                //Apcs can't attack
+                return false;
+            case Unit.ARTILLERY:
+            case Unit.ROCKETS:
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.INFTRY_CLASS:
+                        return true;
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.CPTR_CLASS:
+                        return false;
+                    case Unit.PLANE_CLASS:
+                        return false;
+                    case Unit.SHIP_CLASS:
+                        return true;
+                    case Unit.SUB_CLASS:
+                        return true;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                }
+                break;
+            case Unit.ANTI_AIR:
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.INFTRY_CLASS:
+                        return true;
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.CPTR_CLASS:
+                        return true;
+                    case Unit.PLANE_CLASS:
+                        return true;
+                    case Unit.SHIP_CLASS:
+                        return false;
+                    case Unit.SUB_CLASS:
+                        return false;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                }
+                break;
+            case Unit.MISSILES:
+                switch (Unit.getUnitSuperClass(defender.unitType)) {
+                    case Unit.AIR_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.PIPERUNNER:
+                //Piperunners can hit anything with its pipe cannon.
+                return true;
+            case Unit.FIGHTER:
+                //fighters can only attack air units
+                switch (Unit.getUnitSuperClass(defender.unitType)) {
+                    case Unit.AIR_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.BOMBER:
+                //bombers can bomb down on anything but air units
+                switch (Unit.getUnitSuperClass(defender.unitType)) {
+                    case Unit.AIR_CLASS:
+                        return false;
+                    default:
+                        return true;
+                }
+            case Unit.B_COPTER:
+                //B copters can hit other copters, vehicles, ships and subs.
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.INFTRY_CLASS:
+                        return false;
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.CPTR_CLASS:
+                        return true;
+                    case Unit.PLANE_CLASS:
+                        return false;
+                    case Unit.SHIP_CLASS:
+                        return true;
+                    case Unit.SUB_CLASS:
+                        return true;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                }
+                break;
+            case Unit.T_COPTER:
+                //transport copters can't attack
+                return false;
+            case Unit.STEALTH:
+                //Stealths can bomb anything with its omnimissile
+                return true;
+            case Unit.BLACK_BOMB:
+                //Black bombs are kamikaze units that damage enemy units around them
+                return false;
+            case Unit.BATTLESHIP:
+                //Battleship units can rain havoc amongst land and sea units
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.INFTRY_CLASS:
+                        return true;
+                    case Unit.VEH_CLASS:
+                        return true;
+                    case Unit.CPTR_CLASS:
+                        return false;
+                    case Unit.PLANE_CLASS:
+                        return false;
+                    case Unit.SHIP_CLASS:
+                        return true;
+                    case Unit.SUB_CLASS:
+                        return true;
+                    case Unit.BUILDING_CLASS:
+                        return true;
+                }
+                break;
+            case Unit.CRUISER:
+                //Cruiser can only use missiles against subs
+                switch (Unit.getUnitClass(defender.unitType)) {
+                    case Unit.SUB_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.LANDER:
+                //Landers can't attack
+                return false;
+            case Unit.SUB:
+                //Subs only can attack ships and other subs
+                switch (Unit.getUnitSuperClass(defender.unitType)) {
+                    case Unit.SEA_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.BLACK_BOAT:
+                return false;
+            case Unit.CARRIER:
+                //Carriers are the missiles of the seas
+                switch (Unit.getUnitSuperClass(defender.unitType)) {
+                    case Unit.AIR_CLASS:
+                        return true;
+                    default:
+                        return false;
+                }
+            case Unit.BUILDING:
+                return false;
+            case Unit.OOZIUM:
+                //Oozium doesnt have any weapons
+                return false;
+        }
         return false;
     }
 
-    public static byte getDamageByChartAW(Unit attacker, Unit defender) {
-        return -1;
-    }
-
-    public static byte getDamageByChartAW2(Unit attacker, Unit defender) {
+    public static short getDamageByChartAW2(Unit attacker, Unit defender) {
         switch (attacker.unitType) {
+            //Infantry can only attack with secondary, so no need for switch
+                /*
+             switch (Unit.getEngagingWeapon(attacker, defender)){
+             case Unit.PRIMARY_WEAPON:
+             break;
+             case Unit.SECONDARY_WEAPON:
+             break;                        
+             }*/
             // <editor-fold defaultstate="collapsed" desc="Infantry attacking - Damage Chart">
             case Unit.INFANTRY:
+                // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
                 switch (defender.unitType) {
                     case Unit.INFANTRY:
                         return 55;
@@ -856,161 +1374,97 @@ public class Unit {
                         return 26;
                     case Unit.PIPERUNNER:
                         return 5;
-                    case Unit.FIGHTER:
-                        return -1;
-                    case Unit.BOMBER:
-                        return -1;
                     case Unit.B_COPTER:
                         return 7;
                     case Unit.T_COPTER:
                         return 30;
                     case Unit.STEALTH:
                         return 31;
-                    case Unit.BLACK_BOMB:
-                        return -1;
-                    case Unit.BATTLESHIP:
-                        return -1;
-                    case Unit.CRUISER:
-                        return -1;
-                    case Unit.LANDER:
-                        return -1;
-                    case Unit.SUB:
-                        return -1;
-                    case Unit.BLACK_BOAT:
-                        return -1;
-                    case Unit.CARRIER:
-                        return -1;
                     case Unit.BUILDING:
                         return 1;
                     case Unit.OOZIUM:
                         return 20;
                 }
+                //</editor-fold>
                 break;// </editor-fold>
             // <editor-fold defaultstate="collapsed" desc="Mech attacking - Damage Chart">
             case Unit.MECH:
-
-                if (attacker.currentAmmo > 0) {
-                    // <editor-fold defaultstate="collapsed" desc="with primary weapon">
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 65;
-                        case Unit.MECH:
-                            return 55;
-                        case Unit.RECON:
-                            return 85;
-                        case Unit.TANK:
-                            return 55;
-                        case Unit.MD_TANK:
-                            return 15;
-                        case Unit.NEOTANK:
-                            return 15;
-                        case Unit.MEGATANK:
-                            return 5;
-                        case Unit.APC:
-                            return 75;
-                        case Unit.ARTILLERY:
-                            return 70;
-                        case Unit.ROCKETS:
-                            return 85;
-                        case Unit.ANTI_AIR:
-                            return 65;
-                        case Unit.MISSILES:
-                            return 85;
-                        case Unit.PIPERUNNER:
-                            return 55;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 9;
-                        case Unit.T_COPTER:
-                            return 35;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return -1;
-                        case Unit.CRUISER:
-                            return -1;
-                        case Unit.LANDER:
-                            return -1;
-                        case Unit.SUB:
-                            return -1;
-                        case Unit.BLACK_BOAT:
-                            return -1;
-                        case Unit.CARRIER:
-                            return -1;
-                        case Unit.BUILDING:
-                            return 15;
-                        case Unit.OOZIUM:
-                            return 30;
-                        // </editor-fold>
-                    }
-                }
-                else {
-                    // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 65;
-                        case Unit.MECH:
-                            return 55;
-                        case Unit.RECON:
-                            return 18;
-                        case Unit.TANK:
-                            return 6;
-                        case Unit.MD_TANK:
-                            return 1;
-                        case Unit.NEOTANK:
-                            return 1;
-                        case Unit.MEGATANK:
-                            return 1;
-                        case Unit.APC:
-                            return 20;
-                        case Unit.ARTILLERY:
-                            return 32;
-                        case Unit.ROCKETS:
-                            return 35;
-                        case Unit.ANTI_AIR:
-                            return 6;
-                        case Unit.MISSILES:
-                            return 35;
-                        case Unit.PIPERUNNER:
-                            return 6;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 9;
-                        case Unit.T_COPTER:
-                            return 35;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return -1;
-                        case Unit.CRUISER:
-                            return -1;
-                        case Unit.LANDER:
-                            return -1;
-                        case Unit.SUB:
-                            return -1;
-                        case Unit.BLACK_BOAT:
-                            return -1;
-                        case Unit.CARRIER:
-                            return -1;
-                        case Unit.BUILDING:
-                            return 1;
-                        case Unit.OOZIUM:
-                            return 20;
-                    }// </editor-fold>
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 85;
+                            case Unit.TANK:
+                                return 55;
+                            case Unit.MD_TANK:
+                                return 15;
+                            case Unit.NEOTANK:
+                                return 15;
+                            case Unit.MEGATANK:
+                                return 5;
+                            case Unit.APC:
+                                return 75;
+                            case Unit.ARTILLERY:
+                                return 70;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 65;
+                            case Unit.MISSILES:
+                                return 85;
+                            case Unit.PIPERUNNER:
+                                return 55;
+                            case Unit.BUILDING:
+                                return 15;
+                            case Unit.OOZIUM:
+                                return 30;
+                        }// </editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 65;
+                            case Unit.MECH:
+                                return 55;
+                            case Unit.RECON:
+                                return 18;
+                            case Unit.TANK:
+                                return 6;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 20;
+                            case Unit.ARTILLERY:
+                                return 32;
+                            case Unit.ROCKETS:
+                                return 35;
+                            case Unit.ANTI_AIR:
+                                return 6;
+                            case Unit.MISSILES:
+                                return 35;
+                            case Unit.PIPERUNNER:
+                                return 6;
+                            case Unit.B_COPTER:
+                                return 9;
+                            case Unit.T_COPTER:
+                                return 35;
+                            case Unit.BUILDING:
+                                return 1;
+                            case Unit.OOZIUM:
+                                return 20;
+                        }// </editor-fold>
+                        break;
                 }
                 break;// </editor-fold>
             // <editor-fold defaultstate="collapsed" desc="Recon attacking - Damage Chart">
             case Unit.RECON:
+                //<editor-fold defaultstate="collapsed" desc="with secondary weapon">
                 switch (defender.unitType) {
                     case Unit.INFANTRY:
                         return 70;
@@ -1038,375 +1492,1000 @@ public class Unit {
                         return 28;
                     case Unit.PIPERUNNER:
                         return 6;
-                    case Unit.FIGHTER:
-                        return -1;
-                    case Unit.BOMBER:
-                        return -1;
                     case Unit.B_COPTER:
                         return 10;
                     case Unit.T_COPTER:
                         return 35;
-                    case Unit.STEALTH:
-                        return -1;
-                    case Unit.BLACK_BOMB:
-                        return -1;
-                    case Unit.BATTLESHIP:
-                        return -1;
-                    case Unit.CRUISER:
-                        return -1;
-                    case Unit.LANDER:
-                        return -1;
-                    case Unit.SUB:
-                        return -1;
-                    case Unit.BLACK_BOAT:
-                        return -1;
-                    case Unit.CARRIER:
-                        return -1;
                     case Unit.OOZIUM:
                         return 20;
                     case Unit.BUILDING:
                         return 1;
                 }
-                break;// </editor-fold>
+                //</editor-fold>
+                break;
+            // </editor-fold>
             // <editor-fold defaultstate="collapsed" desc="Tank attacking - Damage Chart">
             case Unit.TANK:
-                if (attacker.currentAmmo > 0) {
-                    // <editor-fold defaultstate="collapsed" desc="with primary weapon">
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 75;
-                        case Unit.MECH:
-                            return 70;
-                        case Unit.RECON:
-                            return 85;
-                        case Unit.TANK:
-                            return 55;
-                        case Unit.MD_TANK:
-                            return 15;
-                        case Unit.NEOTANK:
-                            return 15;
-                        case Unit.MEGATANK:
-                            return 10;
-                        case Unit.APC:
-                            return 75;
-                        case Unit.ARTILLERY:
-                            return 70;
-                        case Unit.ROCKETS:
-                            return 85;
-                        case Unit.ANTI_AIR:
-                            return 65;
-                        case Unit.MISSILES:
-                            return 85;
-                        case Unit.PIPERUNNER:
-                            return 55;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 9;
-                        case Unit.T_COPTER:
-                            return 35;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return 1;
-                        case Unit.CRUISER:
-                            return 5;
-                        case Unit.LANDER:
-                            return 10;
-                        case Unit.SUB:
-                            return 1;
-                        case Unit.BLACK_BOAT:
-                            return 10;
-                        case Unit.CARRIER:
-                            return 1;
-                        case Unit.OOZIUM:
-                            return 15;
-                        case Unit.BUILDING:
-                            return 15;
-                    }
-                    // </editor-fold>
-                }
-                else {
-                    // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 75;
-                        case Unit.MECH:
-                            return 70;
-                        case Unit.RECON:
-                            return 40;
-                        case Unit.TANK:
-                            return 6;
-                        case Unit.MD_TANK:
-                            return 1;
-                        case Unit.NEOTANK:
-                            return 1;
-                        case Unit.MEGATANK:
-                            return 1;
-                        case Unit.APC:
-                            return 45;
-                        case Unit.ARTILLERY:
-                            return 45;
-                        case Unit.ROCKETS:
-                            return 55;
-                        case Unit.ANTI_AIR:
-                            return 5;
-                        case Unit.MISSILES:
-                            return 30;
-                        case Unit.PIPERUNNER:
-                            return 6;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 10;
-                        case Unit.T_COPTER:
-                            return 40;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return -1;
-                        case Unit.CRUISER:
-                            return -1;
-                        case Unit.LANDER:
-                            return -1;
-                        case Unit.SUB:
-                            return -1;
-                        case Unit.BLACK_BOAT:
-                            return -1;
-                        case Unit.CARRIER:
-                            return -1;
-                        case Unit.OOZIUM:
-                            return 20;
-                        case Unit.BUILDING:
-                            return 1;
-                    }
-                    // </editor-fold>
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 85;
+                            case Unit.TANK:
+                                return 55;
+                            case Unit.MD_TANK:
+                                return 15;
+                            case Unit.NEOTANK:
+                                return 15;
+                            case Unit.MEGATANK:
+                                return 10;
+                            case Unit.APC:
+                                return 75;
+                            case Unit.ARTILLERY:
+                                return 70;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 65;
+                            case Unit.MISSILES:
+                                return 85;
+                            case Unit.PIPERUNNER:
+                                return 55;
+                            case Unit.BATTLESHIP:
+                                return 1;
+                            case Unit.CRUISER:
+                                return 5;
+                            case Unit.LANDER:
+                                return 10;
+                            case Unit.SUB:
+                                return 1;
+                            case Unit.BLACK_BOAT:
+                                return 10;
+                            case Unit.CARRIER:
+                                return 1;
+                            case Unit.OOZIUM:
+                                return 20;
+                            case Unit.BUILDING:
+                                return 15;
+                        }
+                        // </editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 75;
+                            case Unit.MECH:
+                                return 70;
+                            case Unit.RECON:
+                                return 40;
+                            case Unit.TANK:
+                                return 6;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 45;
+                            case Unit.ARTILLERY:
+                                return 45;
+                            case Unit.ROCKETS:
+                                return 55;
+                            case Unit.ANTI_AIR:
+                                return 5;
+                            case Unit.MISSILES:
+                                return 30;
+                            case Unit.PIPERUNNER:
+                                return 6;
+                            case Unit.B_COPTER:
+                                return 10;
+                            case Unit.T_COPTER:
+                                return 40;
+                            case Unit.OOZIUM:
+                                return 20;
+                            case Unit.BUILDING:
+                                return 1;
+                        }
+                        // </editor-fold>
+                        break;
                 }
                 break;// </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="MD Tank attacking - Damage Chart">
             case Unit.MD_TANK:
-                if (attacker.currentAmmo > 0) {
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 105;
-                        case Unit.MECH:
-                            return 95;
-                        case Unit.RECON:
-                            return 105;
-                        case Unit.TANK:
-                            return 85;
-                        case Unit.MD_TANK:
-                            return 55;
-                        case Unit.NEOTANK:
-                            return 45;
-                        case Unit.MEGATANK:
-                            return 25;
-                        case Unit.APC:
-                            return 105;
-                        case Unit.ARTILLERY:
-                            return 105;
-                        case Unit.ROCKETS:
-                            return 105;
-                        case Unit.ANTI_AIR:
-                            return 105;
-                        case Unit.MISSILES:
-                            return 105;
-                        case Unit.PIPERUNNER:
-                            return 85;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 12;
-                        case Unit.T_COPTER:
-                            return 45;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return 10;
-                        case Unit.CRUISER:
-                            return 45;
-                        case Unit.LANDER:
-                            return 35;
-                        case Unit.SUB:
-                            return 10;
-                        case Unit.BLACK_BOAT:
-                            return 35;
-                        case Unit.CARRIER:
-                            return 10;
-                        case Unit.OOZIUM:
-                            return 30;
-                        case Unit.BUILDING:
-                            return 55;
-                    }
-                }
-                else {
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 105;
-                        case Unit.MECH:
-                            return 95;
-                        case Unit.RECON:
-                            return 45;
-                        case Unit.TANK:
-                            return 8;
-                        case Unit.MD_TANK:
-                            return 1;
-                        case Unit.NEOTANK:
-                            return 1;
-                        case Unit.MEGATANK:
-                            return 1;
-                        case Unit.APC:
-                            return 45;
-                        case Unit.ARTILLERY:
-                            return 45;
-                        case Unit.ROCKETS:
-                            return 55;
-                        case Unit.ANTI_AIR:
-                            return 7;
-                        case Unit.MISSILES:
-                            return 35;
-                        case Unit.PIPERUNNER:
-                            return 8;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return 12;
-                        case Unit.T_COPTER:
-                            return 45;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return -1;
-                        case Unit.CRUISER:
-                            return -1;
-                        case Unit.LANDER:
-                            return -1;
-                        case Unit.SUB:
-                            return -1;
-                        case Unit.BLACK_BOAT:
-                            return -1;
-                        case Unit.CARRIER:
-                            return -1;
-                        case Unit.OOZIUM:
-                            return 20;
-                        case Unit.BUILDING:
-                            return 1;
-                    }
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 105;
+                            case Unit.TANK:
+                                return 85;
+                            case Unit.MD_TANK:
+                                return 55;
+                            case Unit.NEOTANK:
+                                return 45;
+                            case Unit.MEGATANK:
+                                return 25;
+                            case Unit.APC:
+                                return 105;
+                            case Unit.ARTILLERY:
+                                return 105;
+                            case Unit.ROCKETS:
+                                return 105;
+                            case Unit.ANTI_AIR:
+                                return 105;
+                            case Unit.MISSILES:
+                                return 105;
+                            case Unit.PIPERUNNER:
+                                return 85;
+                            case Unit.BATTLESHIP:
+                                return 10;
+                            case Unit.CRUISER:
+                                return 45;
+                            case Unit.LANDER:
+                                return 35;
+                            case Unit.SUB:
+                                return 10;
+                            case Unit.BLACK_BOAT:
+                                return 35;
+                            case Unit.CARRIER:
+                                return 10;
+                            case Unit.OOZIUM:
+                                return 30;
+                            case Unit.BUILDING:
+                                return 55;
+                        }
+                        //</editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 105;
+                            case Unit.MECH:
+                                return 95;
+                            case Unit.RECON:
+                                return 45;
+                            case Unit.TANK:
+                                return 8;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 45;
+                            case Unit.ARTILLERY:
+                                return 45;
+                            case Unit.ROCKETS:
+                                return 55;
+                            case Unit.ANTI_AIR:
+                                return 7;
+                            case Unit.MISSILES:
+                                return 35;
+                            case Unit.PIPERUNNER:
+                                return 8;
+                            case Unit.B_COPTER:
+                                return 12;
+                            case Unit.T_COPTER:
+                                return 45;
+                            case Unit.OOZIUM:
+                                return 20;
+                            case Unit.BUILDING:
+                                return 1;
+                        }
+                        // </editor-fold>
+                        break;
                 }
                 break;
+            //</editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="NeoTank attacking - Damage Chart">
             case Unit.NEOTANK:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 125;
+                            case Unit.TANK:
+                                return 105;
+                            case Unit.MD_TANK:
+                                return 75;
+                            case Unit.NEOTANK:
+                                return 55;
+                            case Unit.MEGATANK:
+                                return 35;
+                            case Unit.APC:
+                                return 125;
+                            case Unit.ARTILLERY:
+                                return 115;
+                            case Unit.ROCKETS:
+                                return 125;
+                            case Unit.ANTI_AIR:
+                                return 115;
+                            case Unit.MISSILES:
+                                return 125;
+                            case Unit.PIPERUNNER:
+                                return 105;
+                            case Unit.BATTLESHIP:
+                                return 15;
+                            case Unit.CRUISER:
+                                return 50;
+                            case Unit.LANDER:
+                                return 40;
+                            case Unit.SUB:
+                                return 15;
+                            case Unit.BLACK_BOAT:
+                                return 40;
+                            case Unit.CARRIER:
+                                return 15;
+                            case Unit.OOZIUM:
+                                return 35;
+                            case Unit.BUILDING:
+                                return 75;
+                        }
+                        //</editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 125;
+                            case Unit.MECH:
+                                return 115;
+                            case Unit.RECON:
+                                return 65;
+                            case Unit.TANK:
+                                return 10;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 65;
+                            case Unit.ARTILLERY:
+                                return 65;
+                            case Unit.ROCKETS:
+                                return 75;
+                            case Unit.ANTI_AIR:
+                                return 17;
+                            case Unit.MISSILES:
+                                return 55;
+                            case Unit.PIPERUNNER:
+                                return 10;
+                            case Unit.B_COPTER:
+                                return 22;
+                            case Unit.T_COPTER:
+                                return 55;
+                            case Unit.OOZIUM:
+                                return 20;
+                            case Unit.BUILDING:
+                                return 1;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="MegaTank attacking - Damage Chart">
             case Unit.MEGATANK:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 195;
+                            case Unit.TANK:
+                                return 180;
+                            case Unit.MD_TANK:
+                                return 125;
+                            case Unit.NEOTANK:
+                                return 115;
+                            case Unit.MEGATANK:
+                                return 65;
+                            case Unit.APC:
+                                return 195;
+                            case Unit.ARTILLERY:
+                                return 195;
+                            case Unit.ROCKETS:
+                                return 125;
+                            case Unit.ANTI_AIR:
+                                return 115;
+                            case Unit.MISSILES:
+                                return 125;
+                            case Unit.PIPERUNNER:
+                                return 180;
+                            case Unit.BATTLESHIP:
+                                return 45;
+                            case Unit.CRUISER:
+                                return 65;
+                            case Unit.LANDER:
+                                return 75;
+                            case Unit.SUB:
+                                return 45;
+                            case Unit.BLACK_BOAT:
+                                return 105;
+                            case Unit.CARRIER:
+                                return 45;
+                            case Unit.OOZIUM:
+                                return 45;
+                            case Unit.BUILDING:
+                                return 125;
+                        }
+                        //</editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 135;
+                            case Unit.MECH:
+                                return 125;
+                            case Unit.RECON:
+                                return 65;
+                            case Unit.TANK:
+                                return 10;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 65;
+                            case Unit.ARTILLERY:
+                                return 65;
+                            case Unit.ROCKETS:
+                                return 75;
+                            case Unit.ANTI_AIR:
+                                return 17;
+                            case Unit.MISSILES:
+                                return 55;
+                            case Unit.PIPERUNNER:
+                                return 10;
+                            case Unit.B_COPTER:
+                                return 22;
+                            case Unit.T_COPTER:
+                                return 55;
+                            case Unit.OOZIUM:
+                                return 20;
+                            case Unit.BUILDING:
+                                return 1;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            //APCS can't attack
             case Unit.APC:
                 break;
+            // <editor-fold defaultstate="collapsed" desc="Artillery attacking - Damage Chart">
             case Unit.ARTILLERY:
-                if (attacker.currentAmmo > 0) {
-                    switch (defender.unitType) {
-                        case Unit.INFANTRY:
-                            return 90;
-                        case Unit.MECH:
-                            return 85;
-                        case Unit.RECON:
-                            return 80;
-                        case Unit.TANK:
-                            return 70;
-                        case Unit.MD_TANK:
-                            return 45;
-                        case Unit.NEOTANK:
-                            return 40;
-                        case Unit.MEGATANK:
-                            return 15;
-                        case Unit.APC:
-                            return 70;
-                        case Unit.ARTILLERY:
-                            return 75;
-                        case Unit.ROCKETS:
-                            return 80;
-                        case Unit.ANTI_AIR:
-                            return 75;
-                        case Unit.MISSILES:
-                            return 80;
-                        case Unit.PIPERUNNER:
-                            return 70;
-                        case Unit.FIGHTER:
-                            return -1;
-                        case Unit.BOMBER:
-                            return -1;
-                        case Unit.B_COPTER:
-                            return -1;
-                        case Unit.T_COPTER:
-                            return -1;
-                        case Unit.STEALTH:
-                            return -1;
-                        case Unit.BLACK_BOMB:
-                            return -1;
-                        case Unit.BATTLESHIP:
-                            return 40;
-                        case Unit.CRUISER:
-                            return 65;
-                        case Unit.LANDER:
-                            return 55;
-                        case Unit.SUB:
-                            return 60;
-                        case Unit.BLACK_BOAT:
-                            return 55;
-                        case Unit.CARRIER:
-                            return 45;
-                        case Unit.OOZIUM:
-                            return 5;
-                        case Unit.BUILDING:
-                            return 45;
-                    }
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 90;
+                            case Unit.MECH:
+                                return 85;
+                            case Unit.RECON:
+                                return 80;
+                            case Unit.TANK:
+                                return 70;
+                            case Unit.MD_TANK:
+                                return 45;
+                            case Unit.NEOTANK:
+                                return 40;
+                            case Unit.MEGATANK:
+                                return 15;
+                            case Unit.APC:
+                                return 70;
+                            case Unit.ARTILLERY:
+                                return 75;
+                            case Unit.ROCKETS:
+                                return 80;
+                            case Unit.ANTI_AIR:
+                                return 75;
+                            case Unit.MISSILES:
+                                return 80;
+                            case Unit.PIPERUNNER:
+                                return 70;
+                            case Unit.BATTLESHIP:
+                                return 40;
+                            case Unit.CRUISER:
+                                return 65;
+                            case Unit.LANDER:
+                                return 55;
+                            case Unit.SUB:
+                                return 60;
+                            case Unit.BLACK_BOAT:
+                                return 55;
+                            case Unit.CARRIER:
+                                return 45;
+                            case Unit.OOZIUM:
+                                return 5;
+                            case Unit.BUILDING:
+                                return 45;
+                        }
+                        //</editor-fold>
+                        break;
                 }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Rockets attacking - Damage Chart">
             case Unit.ROCKETS:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 95;
+                            case Unit.MECH:
+                                return 90;
+                            case Unit.RECON:
+                                return 90;
+                            case Unit.TANK:
+                                return 80;
+                            case Unit.MD_TANK:
+                                return 55;
+                            case Unit.NEOTANK:
+                                return 50;
+                            case Unit.MEGATANK:
+                                return 25;
+                            case Unit.APC:
+                                return 80;
+                            case Unit.ARTILLERY:
+                                return 80;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 85;
+                            case Unit.MISSILES:
+                                return 90;
+                            case Unit.PIPERUNNER:
+                                return 80;
+                            case Unit.BATTLESHIP:
+                                return 55;
+                            case Unit.CRUISER:
+                                return 85;
+                            case Unit.LANDER:
+                                return 60;
+                            case Unit.SUB:
+                                return 85;
+                            case Unit.BLACK_BOAT:
+                                return 60;
+                            case Unit.CARRIER:
+                                return 60;
+                            case Unit.OOZIUM:
+                                return 15;
+                            case Unit.BUILDING:
+                                return 55;
+                        }
+                        //</editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="A-Air attacking - Damage Chart">
             case Unit.ANTI_AIR:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 105;
+                            case Unit.MECH:
+                                return 105;
+                            case Unit.RECON:
+                                return 60;
+                            case Unit.TANK:
+                                return 25;
+                            case Unit.MD_TANK:
+                                return 10;
+                            case Unit.NEOTANK:
+                                return 5;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 50;
+                            case Unit.ARTILLERY:
+                                return 50;
+                            case Unit.ROCKETS:
+                                return 55;
+                            case Unit.ANTI_AIR:
+                                return 45;
+                            case Unit.MISSILES:
+                                return 55;
+                            case Unit.PIPERUNNER:
+                                return 25;
+                            case Unit.FIGHTER:
+                                return 65;
+                            case Unit.BOMBER:
+                                return 75;
+                            case Unit.B_COPTER:
+                                return 120;
+                            case Unit.T_COPTER:
+                                return 120;
+                            case Unit.STEALTH:
+                                return 75;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                            case Unit.OOZIUM:
+                                return 10;
+                            case Unit.BUILDING:
+                                return 30;
+                        }
+                        //</editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Missiles attacking - Damage Chart">
             case Unit.MISSILES:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case B_COPTER:
+                                return 120;
+                            case T_COPTER:
+                                return 120;
+                            case FIGHTER:
+                                return 120;
+                            case BOMBER:
+                                return 100;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Piperunner attacking - Damage Chart">
             case Unit.PIPERUNNER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 95;
+                            case Unit.MECH:
+                                return 90;
+                            case Unit.RECON:
+                                return 90;
+                            case Unit.TANK:
+                                return 80;
+                            case Unit.MD_TANK:
+                                return 55;
+                            case Unit.NEOTANK:
+                                return 50;
+                            case Unit.MEGATANK:
+                                return 25;
+                            case Unit.APC:
+                                return 80;
+                            case Unit.ARTILLERY:
+                                return 80;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 85;
+                            case Unit.MISSILES:
+                                return 90;
+                            case Unit.PIPERUNNER:
+                                return 80;
+                            case Unit.FIGHTER:
+                                return 65;
+                            case Unit.BOMBER:
+                                return 75;
+                            case Unit.B_COPTER:
+                                return 105;
+                            case Unit.T_COPTER:
+                                return 105;
+                            case Unit.STEALTH:
+                                return 75;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                            case Unit.BATTLESHIP:
+                                return 55;
+                            case Unit.CRUISER:
+                                return 60;
+                            case Unit.LANDER:
+                                return 60;
+                            case Unit.SUB:
+                                return 85;
+                            case Unit.BLACK_BOAT:
+                                return 60;
+                            case Unit.CARRIER:
+                                return 60;
+                            case Unit.OOZIUM:
+                                return 15;
+                            case Unit.BUILDING:
+                                return 55;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Fighter attacking - Damage Chart">
             case Unit.FIGHTER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.FIGHTER:
+                                return 55;
+                            case Unit.BOMBER:
+                                return 100;
+                            case Unit.B_COPTER:
+                                return 100;
+                            case Unit.T_COPTER:
+                                return 100;
+                            case Unit.STEALTH:
+                                return 85;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Bomber attacking - Damage Chart">
             case Unit.BOMBER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 110;
+                            case Unit.MECH:
+                                return 110;
+                            case Unit.RECON:
+                                return 105;
+                            case Unit.TANK:
+                                return 105;
+                            case Unit.MD_TANK:
+                                return 95;
+                            case Unit.NEOTANK:
+                                return 90;
+                            case Unit.MEGATANK:
+                                return 35;
+                            case Unit.APC:
+                                return 105;
+                            case Unit.ARTILLERY:
+                                return 105;
+                            case Unit.ROCKETS:
+                                return 105;
+                            case Unit.ANTI_AIR:
+                                return 95;
+                            case Unit.MISSILES:
+                                return 105;
+                            case Unit.PIPERUNNER:
+                                return 95;
+                            case Unit.BATTLESHIP:
+                                return 75;
+                            case Unit.CRUISER:
+                                return 85;
+                            case Unit.LANDER:
+                                return 95;
+                            case Unit.SUB:
+                                return 95;
+                            case Unit.BLACK_BOAT:
+                                return 95;
+                            case Unit.CARRIER:
+                                return 75;
+                            case Unit.OOZIUM:
+                                return 35;
+                            case Unit.BUILDING:
+                                return 95;
+                        }
+                        // </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="B copter attacking - Damage Chart">
             case Unit.B_COPTER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.RECON:
+                                return 55;
+                            case Unit.TANK:
+                                return 55;
+                            case Unit.MD_TANK:
+                                return 25;
+                            case Unit.NEOTANK:
+                                return 20;
+                            case Unit.MEGATANK:
+                                return 10;
+                            case Unit.APC:
+                                return 60;
+                            case Unit.ARTILLERY:
+                                return 65;
+                            case Unit.ROCKETS:
+                                return 65;
+                            case Unit.ANTI_AIR:
+                                return 25;
+                            case Unit.MISSILES:
+                                return 65;
+                            case Unit.PIPERUNNER:
+                                return 55;
+                            case Unit.BATTLESHIP:
+                                return 25;
+                            case Unit.CRUISER:
+                                return 55;
+                            case Unit.LANDER:
+                                return 25;
+                            case Unit.SUB:
+                                return 25;
+                            case Unit.BLACK_BOAT:
+                                return 25;
+                            case Unit.CARRIER:
+                                return 25;
+                            case Unit.BUILDING:
+                                return 15;
+                            case Unit.OOZIUM:
+                                return 30;
+                        }// </editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 75;
+                            case Unit.MECH:
+                                return 75;
+                            case Unit.RECON:
+                                return 30;
+                            case Unit.TANK:
+                                return 6;
+                            case Unit.MD_TANK:
+                                return 1;
+                            case Unit.NEOTANK:
+                                return 1;
+                            case Unit.MEGATANK:
+                                return 1;
+                            case Unit.APC:
+                                return 20;
+                            case Unit.ARTILLERY:
+                                return 25;
+                            case Unit.ROCKETS:
+                                return 35;
+                            case Unit.ANTI_AIR:
+                                return 6;
+                            case Unit.MISSILES:
+                                return 35;
+                            case Unit.PIPERUNNER:
+                                return 6;
+                            case Unit.B_COPTER:
+                                return 65;
+                            case Unit.T_COPTER:
+                                return 95;
+                            case Unit.BUILDING:
+                                return 1;
+                            case Unit.OOZIUM:
+                                return 20;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            //T Copters can't attack
             case Unit.T_COPTER:
                 break;
+            // <editor-fold defaultstate="collapsed" desc="Stealth attacking - Damage Chart">
             case Unit.STEALTH:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 90;
+                            case Unit.MECH:
+                                return 90;
+                            case Unit.RECON:
+                                return 85;
+                            case Unit.TANK:
+                                return 75;
+                            case Unit.MD_TANK:
+                                return 70;
+                            case Unit.NEOTANK:
+                                return 60;
+                            case Unit.MEGATANK:
+                                return 15;
+                            case Unit.APC:
+                                return 85;
+                            case Unit.ARTILLERY:
+                                return 75;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 50;
+                            case Unit.MISSILES:
+                                return 85;
+                            case Unit.PIPERUNNER:
+                                return 80;
+                            case Unit.FIGHTER:
+                                return 45;
+                            case Unit.BOMBER:
+                                return 70;
+                            case Unit.B_COPTER:
+                                return 85;
+                            case Unit.T_COPTER:
+                                return 95;
+                            case Unit.STEALTH:
+                                return 55;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                            case Unit.BATTLESHIP:
+                                return 45;
+                            case Unit.CRUISER:
+                                return 35;
+                            case Unit.LANDER:
+                                return 65;
+                            case Unit.SUB:
+                                return 55;
+                            case Unit.BLACK_BOAT:
+                                return 65;
+                            case Unit.CARRIER:
+                                return 45;
+                            case Unit.BUILDING:
+                                return 70;
+                            case Unit.OOZIUM:
+                                return 30;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            //Black Bombs can't attack
             case Unit.BLACK_BOMB:
                 break;
+            // <editor-fold defaultstate="collapsed" desc="B Ship attacking - Damage Chart">    
             case Unit.BATTLESHIP:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.INFANTRY:
+                                return 95;
+                            case Unit.MECH:
+                                return 90;
+                            case Unit.RECON:
+                                return 90;
+                            case Unit.TANK:
+                                return 90;
+                            case Unit.MD_TANK:
+                                return 80;
+                            case Unit.NEOTANK:
+                                return 55;
+                            case Unit.MEGATANK:
+                                return 25;
+                            case Unit.APC:
+                                return 80;
+                            case Unit.ARTILLERY:
+                                return 80;
+                            case Unit.ROCKETS:
+                                return 85;
+                            case Unit.ANTI_AIR:
+                                return 85;
+                            case Unit.MISSILES:
+                                return 90;
+                            case Unit.PIPERUNNER:
+                                return 80;
+                            case Unit.BATTLESHIP:
+                                return 50;
+                            case Unit.CRUISER:
+                                return 95;
+                            case Unit.LANDER:
+                                return 95;
+                            case Unit.SUB:
+                                return 95;
+                            case Unit.BLACK_BOAT:
+                                return 95;
+                            case Unit.CARRIER:
+                                return 60;
+                            case Unit.BUILDING:
+                                return 55;
+                            case Unit.OOZIUM:
+                                return 20;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            // <editor-fold defaultstate="collapsed" desc="Cruiser attacking - Damage Chart">
             case Unit.CRUISER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.SUB:
+                                return 90;
+                        }// </editor-fold>
+                        break;
+                    case Unit.SECONDARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with secondary weapon">
+                        switch (defender.unitType) {
+                            case Unit.B_COPTER:
+                                return 115;
+                            case Unit.T_COPTER:
+                                return 115;
+                            case Unit.FIGHTER:
+                                return 55;
+                            case Unit.BOMBER:
+                                return 65;
+                            case Unit.STEALTH:
+                                return 100;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            //Landers can't attack
             case Unit.LANDER:
                 break;
+            // <editor-fold defaultstate="collapsed" desc="Sub attacking - Damage Chart">
             case Unit.SUB:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.B_COPTER:
+                                return 115;
+                            case Unit.T_COPTER:
+                                return 115;
+                            case Unit.FIGHTER:
+                                return 100;
+                            case Unit.BOMBER:
+                                return 100;
+                            case Unit.STEALTH:
+                                return 100;
+                            case Unit.BLACK_BOMB:
+                                return 120;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            // </editor-fold>
+            //Black boat can't attack
             case Unit.BLACK_BOAT:
                 break;
+            // <editor-fold defaultstate="collapsed" desc="Carrier attacking - Damage Chart">   
             case Unit.CARRIER:
+                switch (Unit.getEngagingWeapon(attacker, defender)) {
+                    case Unit.PRIMARY_WEAPON:
+                        // <editor-fold defaultstate="collapsed" desc="with primary weapon">
+                        switch (defender.unitType) {
+                            case Unit.LANDER:
+                                return 95;
+                            case Unit.BATTLESHIP:
+                                return 55;
+                            case Unit.CRUISER:
+                                return 25;
+                            case Unit.SUB:
+                                return 55;
+                            case Unit.CARRIER:
+                                return 75;
+                            case Unit.BLACK_BOAT:
+                                return 95;
+                        }// </editor-fold>
+                        break;
+                }
                 break;
+            //</editor-fold>
         }
         return -1;
     }
@@ -1518,5 +2597,24 @@ public class Unit {
                 return 9;
         }
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        return Unit.toString(this);
+    }
+
+    public static String toString(Unit u) {
+        return "Unit: " + Unit.getUnitName(u.unitType)
+                + ", HP: " + u.currentHP
+                + ", Fuel: " + u.currentFuel
+                + ", CurrentAmmo: " + u.currentAmmo
+                + " on " + u.location.terrain.name
+                + " @ (" + u.location.x + ", " + u.location.y + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return false;
     }
 }

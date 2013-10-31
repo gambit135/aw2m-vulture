@@ -49,9 +49,20 @@ public class MapCatalog {
             case SPANN_ISLAND:
                 return "https://dl.dropboxusercontent.com/u/20278793/aw2m/maps/SpannIsland/SpannIsland_console.csv";
             case POINT_STORMY:
-                return "";
+                return "https://dl.dropboxusercontent.com/u/20278793/aw2m/maps/PointStormy/PointStormy-console.csv";
             default:
                 return "";
+        }
+    }
+
+    public static byte getNumberOfProperties(byte mapID) {
+        switch (mapID) {
+            case SPANN_ISLAND:
+                return 21;
+            case POINT_STORMY:
+                return 48;
+            default:
+                return 0;
         }
     }
 }

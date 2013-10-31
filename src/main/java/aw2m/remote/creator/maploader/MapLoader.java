@@ -2,6 +2,7 @@ package aw2m.remote.creator.maploader;
 
 import aw2m.common.core.GameInstance;
 import aw2m.common.core.GridCell;
+import aw2m.common.core.Player;
 import aw2m.common.core.Property;
 import aw2m.common.core.PropertyInstance;
 import aw2m.common.core.Terrain;
@@ -33,27 +34,46 @@ public class MapLoader {
     static {
     }
 
+    /**
+     * Loads a map from the catalog and unto the map attribute of the
+     * GameInstance object sent as parameter. Note that the GameInstance
+     * players[] attribute should already be initialized with the information of
+     * actual players, otherwise it will throw a NullPointerException.
+     *
+     * @param game  The GameInstance object to be modified by reference,
+     *              containing players[] attribute already initialized, and which
+     *              map[][] attribute wil be overriden.
+     * @param mapID The id of the map to be loaded from catalog.
+     */
     public static void loadMapFromCatalog(GameInstance game, byte mapID) {
-        MapLoader.game = game;
         MapLoader.loadMap(
+                game,
                 MapCatalog.getXsize(mapID),
                 MapCatalog.getYsize(mapID),
                 MapCatalog.getURL(mapID), true);
+
     }
 
     /**
-     * Creates a new Gridcell[][] object and loads the information of a map
-     * file, locally or via a URL.
+     * Takes a GameInstance object already initialized with player info and
+     * loads the information of a map file, locally or via an URL as a matrix of
+     * GridCell objects unto its map attribute. Note that this method requires
+     * that the players[] attribute of the GameInstance object sent as parameter
+     * be already initialized with the information of actual players.
      *
-     * @param x
-     * @param y
-     * @param address
-     * @param isRemote
+     * @param xSize    the x size of the map to be loaded
+     * @param ySize    the y size of the map to be loaded
+     * @param address  A String object containing the address, local or URL,
+     *                 from where the map will be loaded.
+     * @param isRemote Indicates wether the file will be loaded locally or
+     *                 remotely.
      */
-    public static void loadMap(byte x, byte y, String address, boolean isRemote) {
-        MapLoader.sizeX = x;
-        MapLoader.sizeY = y;
+    public static void loadMap(GameInstance game, byte xSize, byte ySize, String address, boolean isRemote) {
+        MapLoader.game = game;
+        MapLoader.sizeX = xSize;
+        sizeY = ySize;
         game.map = new GridCell[MapLoader.sizeX][MapLoader.sizeY];
+        //Initialize map[][] with empty gridcells
         for (byte j = 0; j < MapLoader.sizeY; j++) {
             for (byte i = 0; i < MapLoader.sizeX; i++) {
                 game.map[i][j] = new GridCell();
@@ -68,11 +88,24 @@ public class MapLoader {
             MapLoader.loadLocalFile(address);
         }
         //Account properties for each player
-        for (GridCell[] row : game.map) {
+        accountPropertiesForEachPlayer(game.map, game.players);
+
+
+    }
+
+    /**
+     * Accounts properties on a map for each player, adding each player's
+     * property to their individual "properties" list.
+     *
+     * @param map
+     * @param players
+     */
+    public static void accountPropertiesForEachPlayer(GridCell[][] map, Player[] players) {
+        for (GridCell[] row : map) {
             for (GridCell g : row) {
                 if (g.isProperty) {
                     System.out.println("Accounting property @(" + g.x + ", " + g.y + ")");
-                    game.players[g.propertyInstance.player.id].properties.add(g);
+                    players[g.propertyInstance.player.id].properties.add(g);
                 }
             }
         }

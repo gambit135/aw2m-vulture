@@ -44,9 +44,9 @@ public class Player {
      * 65,536 teams.
      */
     public String teamSymbol;
-    byte team;
+    public byte team;
     public CO currentCO;
-    CO tagCO;
+    public CO tagCO;
     public int funds;
     byte days;
     byte powerScore;
@@ -117,13 +117,14 @@ public class Player {
         this.powerScore = 0;
         this.speedScore = 0;
         this.techniqueScore = 0;
-        this.team = 0;
+        this.team = 1;
         this.hasNoPower = true;
         this.hasPowerOn = false;
         this.hasSuperPowerOn = false;
+        this.tagPower = false;
         this.units = new LinkedList<Unit>();
         this.properties = new LinkedList<GridCell>();
-        this.teamSymbol = "n";
+        //this.teamSymbol = "n";
     }
 
     public void setAW2StandardRulesOnPlayer() {
