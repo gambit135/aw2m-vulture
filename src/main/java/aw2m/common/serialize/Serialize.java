@@ -41,7 +41,7 @@ public class Serialize {
                 s += "0";
             }
             s += ".";
-            s += String.valueOf(p.team);
+            s += p.team;
             /*
              if (p.teamSymbol == null) {
              System.out.println("Player about to serialize has no team");
