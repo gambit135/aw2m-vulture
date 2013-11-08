@@ -104,7 +104,8 @@ public class MapLoader {
         for (GridCell[] row : map) {
             for (GridCell g : row) {
                 if (g.isProperty) {
-                    System.out.println("Accounting property @(" + g.x + ", " + g.y + ")");
+                	//DEBUG
+                    //System.out.println("Accounting property @(" + g.x + ", " + g.y + ")");
                     players[g.propertyInstance.player.id].properties.add(g);
                 }
             }
@@ -168,7 +169,8 @@ public class MapLoader {
             br = new BufferedReader(new InputStreamReader(url.openStream()));
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                //DEBUG
+            	//System.out.println(line);
                 processCSVLine(line, Yindex);
 
                 Yindex++;
@@ -194,12 +196,13 @@ public class MapLoader {
     }
 
     private static void processCSVLine(String line, byte y) {
-        System.out.println("on processCSVLine");
-        System.out.println("sizeX is " + sizeX);
+        //DEBUG
+    	//System.out.println("on processCSVLine");
+        //System.out.println("sizeX is " + sizeX);
         for (byte x = 0; x < MapLoader.sizeX; x++) {
             //DEBUG
-            System.out.println("Map Loader.sizeX: " + MapLoader.sizeX);
-            System.out.println("byte x: " + x);
+            //System.out.println("Map Loader.sizeX: " + MapLoader.sizeX);
+            //System.out.println("byte x: " + x);
             line = MapLoader.findNextCSV(line, x, y);
         }
     }
@@ -218,7 +221,7 @@ public class MapLoader {
     public static String findNextCSV(String line, byte x, byte y) {
         int index;
         //DEBUG
-        System.out.println("On findNextCSV");
+        //System.out.println("On findNextCSV");
         //If there are still CSVs remaining to be processed
         if (line != null) {
             //Find the end of the next CSV
@@ -227,11 +230,11 @@ public class MapLoader {
                 //There are no CSVs left to be processed
                 case -1:
                     //DEBUG
-                    System.out.println("There are no CSVs left to be processed, maybe the last");
+                    //System.out.println("There are no CSVs left to be processed, maybe the last");
                     //Unless, it's the last value, which has no coma, but it has a number
                     if (line.length() > 0) {
                         //DEBUG
-                        System.out.println("Doing something with found csv");
+                        //System.out.println("Doing something with found csv");
                         MapLoader.processCSV(line, x, y);
                     }
                     return null;
@@ -247,7 +250,7 @@ public class MapLoader {
                 default:
                     //Do something with the found CSV
                     //DEBUG
-                    System.out.println("Doing something with found csv");
+                    //System.out.println("Doing something with found csv");
                     MapLoader.processCSV(line.substring(0, index), x, y);
                     //Return a chopped version of the line,
                     //removing the new found CSV
@@ -268,7 +271,7 @@ public class MapLoader {
         //indexing them
         int index;
         //DEBUG
-        System.out.println("On process CSV(" + csv + "," + x + "," + y + ")");
+        //System.out.println("On process CSV(" + csv + "," + x + "," + y + ")");
         byte terrainType;
         byte spriteID;
         if (csv != null) {
@@ -286,9 +289,9 @@ public class MapLoader {
                 //There is only a TERRAIN part, (i.e. this is not a property)
                 case -1:
                     //DEBUG
-                    System.out.println("There is only a TERRAIN part, (i.e. this is not a property)");
-                    //Get the Terrain part
-                    System.out.println("Get the Terrain part");
+                    //System.out.println("There is only a TERRAIN part, (i.e. this is not a property)");
+                    //System.out.println("Get the Terrain part");
+                	//Get the Terrain part
                     terrainType = Byte.parseByte(csv);
                     MapLoader.assignTerrain(terrainType, x, y);
                     return;
@@ -297,14 +300,14 @@ public class MapLoader {
                 default:
                     //Get the Terrain part
                     //DEBUG
-                    System.out.println("Otherwise, there is a TERRAIN and a PLAYER part");
+                    //System.out.println("Otherwise, there is a TERRAIN and a PLAYER part");
                     terrainType = Byte.parseByte(csv.substring(0, index));
                     MapLoader.assignTerrain(terrainType, x, y);
                     //Get property's PLAYER part
                     //DEBUG
-                    System.out.println("Get property's PLAYER part, or the corresponding terrain SPRITE");
+                    //System.out.println("Get property's PLAYER part, or the corresponding terrain SPRITE");
                     spriteID = Byte.parseByte(csv.substring(++index));
-                    System.out.println("Sprite ID: " + spriteID);
+                    //System.out.println("Sprite ID: " + spriteID);
                     MapLoader.assignPlayerToProperty(spriteID, terrainType, x, y);
             }
         }
@@ -313,7 +316,7 @@ public class MapLoader {
     public static void assignTerrain(byte terrainType, byte x, byte y) {
         Terrain t = null;
         //DEBUG
-        System.out.println("ON assignTerrain(" + terrainType + "," + x + "," + y + ")");
+        //System.out.println("ON assignTerrain(" + terrainType + "," + x + "," + y + ")");
         if (MapLoader.game.map[x][y] != null) {
             switch (terrainType) {
                 case Terrain.HQ:
@@ -367,17 +370,18 @@ public class MapLoader {
                 case Terrain.PIPE:
                 case Terrain.PIPE_JOINTS:
             }
-            System.out.println("Terrain assigned: " + terrainType + " @(" + x + "," + y + ")");
+            //DEBUG
+            //System.out.println("Terrain assigned: " + terrainType + " @(" + x + "," + y + ")");
         }
     }
 
     static void assignPlayerToProperty(byte playerID, byte propertyType, byte x, byte y) {
         //DEBUG
-        System.out.println("on assignPlayerToProperty(" + playerID + "," + propertyType + "," + x + "," + y + ")");
+        //System.out.println("on assignPlayerToProperty(" + playerID + "," + propertyType + "," + x + "," + y + ")");
         if (MapLoader.game.map[x][y] != null) {
             if (MapLoader.game.map[x][y].isProperty) {
                 //DEBUG
-                System.out.println("map[" + x + "][" + y + "] is a property!!");
+                //System.out.println("map[" + x + "][" + y + "] is a property!!");
                 MapLoader.game.map[x][y].property = Property.getAbstractProperty(propertyType);
                 MapLoader.game.map[x][y].property.propertyType = propertyType;
                 //Player 0 is Gaia
@@ -385,7 +389,7 @@ public class MapLoader {
             }
             else {
                 //DEBUG
-                System.out.println("map[" + x + "][" + y + "] is NOT a property!!");
+                //System.out.println("map[" + x + "][" + y + "] is NOT a property!!");
 
             }
         }
