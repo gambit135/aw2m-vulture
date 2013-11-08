@@ -104,7 +104,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
         // The updated serialized data must be printed
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
-        
+
         //Register time before doing stuff
         Date beforeProcessing = new Date();
         //Do something with the received parameters.
@@ -113,21 +113,59 @@ public class DeserializeEndpointServlet extends HttpServlet {
         GameRebuilder rebuilder = new GameRebuilder(request, out);
         rebuilder.getParametersFromRequest();
 
-        //Start AI
+        /*
+         //Start AI
+         Search search = new Search(rebuilder.rebuiltGame.map);
+         Branch branch = search.createBranchFromOptimalNodes(rebuilder.rebuiltGame.players[1].units);
+         if (branch != null) {
+         branch.evalValue = BranchEvalFunctions.evalBranch(branch);
+         System.out.println("Total branch eval value: " + branch.evalValue);
+         System.out.println("\n Total branches on Branch list: " + search.branches.size());
+         System.out.println("\nOptimal branch:" + search.findOptimalBranchFromBranches(search.branches).toString());
+         }
+         else {
+         System.out.println("\nTotal branches on Branch list: " + search.branches.size());
+         System.out.println("No optimal branch was generated");
+         }
+         */
 
         Search search = new Search(rebuilder.rebuiltGame.map);
-        Branch branch = search.createBranchFromOptimalNodes(rebuilder.rebuiltGame.players[1].units);
-        if (branch != null) {
-            branch.evalValue = BranchEvalFunctions.evalBranch(branch);
-            System.out.println("Total branch eval value: " + branch.evalValue);
-            System.out.println("\n Total branches on Branch list: " + search.branches.size());
-            System.out.println("\nOptimal branch:" + search.findOptimalBranchFromBranches(search.branches).toString());
+        Branch branch = null;
+        if (rebuilder.rebuiltGame.players[1].units != null) {
+            if (rebuilder.rebuiltGame.players[1].units.isEmpty()) {
+                System.out.println("Player 1 units list is empty");
+            }
+            else {
+                System.out.println("Player 1 units list has "
+                        + rebuilder.rebuiltGame.players[1].units.size()
+                        + " units");
+            }
         }
         else {
-            System.out.println("\nTotal branches on Branch list: " + search.branches.size());
+            System.out.println("Player 1 units list is null!!");
+
+        }
+        branch = search
+                .createBranchFromOptimalNodes(rebuilder.rebuiltGame.players[1].units);
+
+        if (branch != null) {
+            branch.evalValue = BranchEvalFunctions.evalBranch(branch);
+            System.out.println("Total branch eval value: "
+                    + branch.evalValue);
+            System.out.println("\n Total branches on Branch list: "
+                    + search.branches.size());
+
+            System.out.println("\nOptimal branch:"
+                    + search.findOptimalBranchFromBranches(search.branches)
+                    .toString());
+            // System.out.println("\nNo. of nodes on optimal branch: " +
+            // search.optimalBranch.branch.size());
+        }
+        else {
+            System.out.println("\nTotal branches on Branch list: "
+                    + search.branches.size());
             System.out.println("No optimal branch was generated");
         }
-
         Date afterProcessing = new Date();
 
 
