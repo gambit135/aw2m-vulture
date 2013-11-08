@@ -65,6 +65,7 @@ public class Deserialize {
                         }
                         */
                         playerObject.team = Byte.parseByte(rawDSV);
+                        System.out.println("Deserialized Player team is: " + playerObject.team);
                         break;
                     case 2:
                         playerObject.currentCO = new CO(Byte.parseByte(rawDSV));
