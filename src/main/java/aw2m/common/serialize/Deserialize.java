@@ -251,6 +251,7 @@ public class Deserialize {
                         while (st3.hasMoreTokens()) {
                             Unit unitObject = new Unit();
                             players[Byte.parseByte(playerID)].units.add(unitObject);
+                            unitObject.player = players[Byte.parseByte(playerID)];
                             String unit = st3.nextToken();
                             byte attributeCounter = 0;
                             byte x = 0, y = 0;
@@ -291,7 +292,7 @@ public class Deserialize {
         //Prints each unit for each player
         for (Player p : players) {
             System.out.println("Units for Player " + p.id);
-            for (Unit u : p.units) {               
+            for (Unit u : p.units) {
                 System.out.println(u.toString());
             }
         }
