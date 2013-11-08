@@ -63,10 +63,10 @@ public class NodeEvalFunctions {
         byte damageOnDefender = (byte) (defender.currentHP - combatOutcome[0]);
 
         //DEBUG
-        System.out.println("OWN HP: " + combatOutcome[1]);
-        System.out.println("ENEMY HP: " + combatOutcome[0]);
-        System.out.println("OWN COST: " + Unit.getUnitCostFactor(attacker.unitType));
-        System.out.println("ENEMY COST: " + Unit.getUnitCostFactor(defender.unitType));
+//        System.out.println("OWN HP: " + combatOutcome[1]);
+//        System.out.println("ENEMY HP: " + combatOutcome[0]);
+//        System.out.println("OWN COST: " + Unit.getUnitCostFactor(attacker.unitType));
+//        System.out.println("ENEMY COST: " + Unit.getUnitCostFactor(defender.unitType));
         
         return (short) (damageOnDefender * Unit.getUnitCostFactor(defender.unitType) * (((Unit.getUnitCostFactor(attacker.unitType)) * (combatOutcome[1] - damageOnAttacker))
                 + ((Unit.getUnitCostFactor(defender.unitType)) * (damageOnDefender - combatOutcome[0]))));

@@ -25,7 +25,9 @@ public class Branch {
             nodes += n.toString();
         }
         return "\nBranch: \n"
-                + "Optimal Nodes on Branch: \n"
+        		+ "Number of optimal nodes on Branch: " 
+        		+ this.branch.size()
+                + "\nOptimal Nodes on Branch: \n"
                 + nodes + "\n"
                 + "Branch eval value: "
                 + this.evalValue

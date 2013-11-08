@@ -1101,7 +1101,7 @@ public class Unit {
             case Unit.CARRIER:
                 maxRange = 8;
         }
-        //maxRange modifiers, CO dependant
+        //maxRange modifiers, CO dependent
         switch (unit.player.currentCO.id) {
             case CO.MAX:
                 return --maxRange;
@@ -2608,6 +2608,7 @@ public class Unit {
         return "Unit: " + Unit.getUnitName(u.unitType)
                 + ", HP: " + u.currentHP
                 + ", Fuel: " + u.currentFuel
+                + ", P: " + u.player.id
                 + ", CurrentAmmo: " + u.currentAmmo
                 + " on " + u.location.terrain.name
                 + " @ (" + u.location.x + ", " + u.location.y + ")";

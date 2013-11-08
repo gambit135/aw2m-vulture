@@ -1,9 +1,11 @@
 package aw2m.remote.endpoint;
 
 import aw2m.common.core.GameInstance;
-import aw2m.common.core.Player;
 import aw2m.common.serialize.Deserialize;
 import aw2m.remote.creator.maploader.MapLoader;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -26,10 +28,13 @@ public class GameRebuilder {
     byte mapChosen;
     boolean isPredefined;
     String output;
+    PrintWriter out;
 
-    public GameRebuilder(HttpServletRequest request) {
+    public GameRebuilder(HttpServletRequest request, PrintWriter out) {
+
         this.request = request;
         this.output = "";
+        this.out = out;
     }
 
     public void getParametersFromRequest() {
@@ -78,7 +83,7 @@ public class GameRebuilder {
         Deserialize d = new Deserialize();
         //First deserialize Players
         rebuiltGame.players = d.deserializePlayers(request.getParameter("players"));
-        
+
 
         //Deserialize map and terrain
         if (isPredefined) {
@@ -90,10 +95,10 @@ public class GameRebuilder {
         }
         //Deserialize Properties
         d.deserializeProperties(request.getParameter("properties"), rebuiltGame.map, rebuiltGame.players);
-        
+
         //Deserialize units
         d.deserializeUnits(request.getParameter("units"), rebuiltGame.map, rebuiltGame.players);
-        
+
     }
 
     /**

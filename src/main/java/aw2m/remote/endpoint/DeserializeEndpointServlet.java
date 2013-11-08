@@ -101,13 +101,16 @@ public class DeserializeEndpointServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        // The updated serialized data must be printed
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html;charset=UTF-8");
+        
         //Register time before doing stuff
         Date beforeProcessing = new Date();
         //Do something with the received parameters.
 
         //Rebuild the game
-        GameRebuilder rebuilder = new GameRebuilder(request);
+        GameRebuilder rebuilder = new GameRebuilder(request, out);
         rebuilder.getParametersFromRequest();
 
         //Start AI
@@ -128,10 +131,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
         Date afterProcessing = new Date();
 
 
-        response.setContentType("text/html;charset=UTF-8");
 
-        //The updated serialized data must be printed
-        PrintWriter out = response.getWriter();
 
 
         try {

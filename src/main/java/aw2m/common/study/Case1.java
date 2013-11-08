@@ -7,6 +7,7 @@ import aw2m.common.core.GameInstance;
 import aw2m.common.core.GridCell;
 import aw2m.common.core.Unit;
 import aw2m.common.factory.UnitFactory;
+import aw2m.common.serialize.MakePostRequest;
 import aw2m.common.serialize.Serialize;
 import aw2m.common.stats.Statistic;
 import aw2m.remote.creator.maploader.MapCatalog;
@@ -72,15 +73,21 @@ public class Case1 {
 
         //Stage 2.5 - If its remote - serialize and send. Wait and receive
         if (isRemote) {
-            
+
             //Then, assemble the request
             //Use Android Code
-            
+            MakePostRequest request = new MakePostRequest(mainGameInstance);
+
             //This line goes before request.executePostRequest();
             timeBeforeExecutingRequest = new Date();
-            
+
+            String result = request.executePostRequest();
+
             //This line goes after request.executePostRequest();
             timeAfterExecutingRequest = new Date();
+
+            System.out.println("THIS SHOULD PRINT THE RESPONSE BODY");
+            System.out.println(result);
         }
         else {
             //Stage 3: Combat tests - Local
@@ -175,7 +182,7 @@ public class Case1 {
             System.out.println("Serialized units");
             serializedUnits = s.serializeUnits(mainGameInstance);
             System.out.println(serializedUnits);
-            
+
             //Bytes to serialize
             int bytesToSerialize = 0;
             bytesToSerialize += Statistic.calculateByteSizeOfString(serializedPlayers);
