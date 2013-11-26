@@ -106,7 +106,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         //Register time before doing stuff
-        Date beforeProcessing = new Date();
+        long beforeProcessing = new Date().getTime();
         //Do something with the received parameters.
 
         //Rebuild the game
@@ -166,7 +166,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
                     + search.branches.size());
             System.out.println("No optimal branch was generated");
         }
-        Date afterProcessing = new Date();
+        long afterProcessing = new Date().getTime();
 
 
 
@@ -182,6 +182,7 @@ public class DeserializeEndpointServlet extends HttpServlet {
             out.println("<h1>This is the POST METHOD @ Servlet DeserializeEndpoint Mark II </h1>");
             out.println("<h2>Server time before processing: " + beforeProcessing + "</h2>");
             out.println("<h2>Server time after processing: " + afterProcessing + "</h2>");
+            out.println("Total processing time: " + (afterProcessing - beforeProcessing));
 
             out.println("<ul>");
 
