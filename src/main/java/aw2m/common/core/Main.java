@@ -72,7 +72,7 @@ public class Main {
         //Requires previously set map on Logic
         Unit u = new Unit();
         u.location = map[9][9];
-        u.unitType = Unit.FIGHTER;
+        u.unitType = Unit.B_COPTER;
         u.player = new Player((byte)1);        
         u.player.currentCO = new CO(CO.ANDY);
 
